@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: manager-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: manager
+  ports:
+    - port: 3000

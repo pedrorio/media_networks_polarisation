@@ -1,0 +1,56 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: news
+profiles:
+
+  - name: development
+    build:
+      artifacts:
+        - image: news/manager
+          context: manager
+          docker:
+            dockerfile: Dockerfile
+            cacheFrom:
+              - node:14.5-alpine
+            noCache: true
+          sync:
+            manual:
+              - src: '**/*.js'
+                dest: .
+              - src: '**/*.ts'
+                dest: .
+
+        - image: news/worker
+          context: worker
+          docker:
+            dockerfile: Dockerfile
+            cacheFrom:
+              - node:14.5-alpine
+            noCache: true
+          sync:
+            manual:
+              - src: '**/*.js'
+                dest: .
+              - src: '**/*.ts'
+                dest: .
+
+        - image: news/entities
+          context: entities
+          docker:
+            dockerfile: Dockerfile
+            cacheFrom:
+              - node:14.5-alpine
+            noCache: true
+          sync:
+            manual:
+              - src: '**/*.js'
+                dest: .
+              - src: '**/*.ts'
+                dest: .
+
+    deploy:
+      kustomize:
+        paths:
+          - k8s/overlays/development/secrets
+          - k8s/base

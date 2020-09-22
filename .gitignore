@@ -1,0 +1,6 @@
+airflow
+**/cache
+network
+data/**
+!data/**/
+!data/**/.gitkeep

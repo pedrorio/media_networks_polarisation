@@ -1,0 +1,1 @@
+jq -rsn 'inputs' $RESEARCH/media_networks_polarisation/data/clean/*.json > $RESEARCH/media_networks_polarisation/data/composite/data.json

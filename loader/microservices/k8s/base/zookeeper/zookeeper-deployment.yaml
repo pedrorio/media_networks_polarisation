@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: zookeeper
+  template:
+    metadata:
+      labels:
+        component: zookeeper
+    spec:
+      volumes:
+        - name: zookeeper-storage
+          persistentVolumeClaim:
+            claimName: broker-persistent-volume-claim
+      containers:
+        - name: zookeeper
+          image: bitnami/zookeeper:3.6.1
+          ports:
+            - containerPort: 2181
+              hostPort: 2181
+          volumeMounts:
+            - name: zookeeper-storage
+              mountPath: /bitnami/zookeeper
+              subPath: data/zookeeper
+          env:
+            - name:  ALLOW_ANONYMOUS_LOGIN
+              value: 'yes'

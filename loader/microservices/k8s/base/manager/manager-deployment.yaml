@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: manager-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: manager
+  template:
+    metadata:
+      labels:
+        component: manager
+    spec:
+      containers:
+        - name: manager
+          image: news/manager
+          env:
+            
+            - name: KAFKA_HOST
+              value: kafka-cluster-ip-service
+            - name: KAFKA_PORT
+              value: '9092'
