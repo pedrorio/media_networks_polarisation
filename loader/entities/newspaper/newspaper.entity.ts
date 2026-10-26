@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import { BaseEntity, Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Article } from "../article/article.entity";
 import { newspapers } from "../../constants";
@@ -8,6 +9,7 @@ export class Newspaper extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
   
+  @Expose()
   @Index({ unique: true }) @Column()
   @IsString()
   name!: keyof newspapers;

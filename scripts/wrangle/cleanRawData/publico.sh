@@ -1,3 +1,4 @@
+clean_tmp=$(mktemp)
 jq -r '
 unique_by(.id) | 
 unique_by(.titulo) |
@@ -58,5 +59,6 @@ select(
 	and
 	((.tags | length) > 0)
 )
-' $RESEARCH/media_networks_polarisation/data/raw/publico.json > $RESEARCH/media_networks_polarisation/data/clean/publico.json
-sed 's/<[^>]*>//g ; /^$/d' $RESEARCH/media_networks_polarisation/data/clean/publico.json > $RESEARCH/media_networks_polarisation/data/clean/publico.json
+' "$RESEARCH/media_networks_polarisation/data/raw/publico.json" > "$clean_tmp"
+sed 's/<[^>]*>//g ; /^$/d' "$clean_tmp" > "$RESEARCH/media_networks_polarisation/data/clean/publico.json"
+rm -f "$clean_tmp"

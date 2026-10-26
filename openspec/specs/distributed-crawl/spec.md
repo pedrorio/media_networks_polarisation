@@ -50,13 +50,13 @@ The worker SHALL parse the message value as a base-10 integer page number, fetch
 - **THEN** pageOldestArticle is omitted
 - **AND** the manager produces no next-page messages
 
-### Requirement: Worker page fetch emits one message per article
-The worker page handler SHALL parse the value as a base-10 integer, fetch that Público list page, and produce one PUBLICO message per returned element with key PAGE_DATA and that element as JSON. It SHALL NOT send the page as one array.
+### Requirement: Worker page fetch emits the page array
+The worker page handler SHALL parse the value as a base-10 integer page number, fetch that Público list page, and produce one PUBLICO message with key PAGE_DATA whose value is the JSON array of articles on that page.
 
 #### Scenario: Page returns three articles
 - **WHEN** the list endpoint returns three article objects
-- **THEN** the worker produces three PAGE_DATA messages
-- **AND** each value is one article object
+- **THEN** the worker produces one PAGE_DATA message
+- **AND** the value is a JSON array of those three objects
 
 ### Requirement: Manager page handler treats the value as an array
 The manager PAGE_DATA handler SHALL parse the value as JSON and map it as an array of articles. For each element whose title is not already stored it SHALL produce RETRIEVE_ARTICLE with that element's JSON as the value.
@@ -66,37 +66,37 @@ The manager PAGE_DATA handler SHALL parse the value as JSON and map it as an arr
 - **THEN** the manager looks up titles and enqueues one RETRIEVE_ARTICLE per title that is not stored
 
 #### Scenario: Value is one article object
-- **WHEN** the value is a single JSON object, which is what the worker page handler sends
+- **WHEN** the value is a single JSON object
 - **THEN** mapping the parsed value as an array throws
 - **AND** no RETRIEVE_ARTICLE message is produced
 
-### Requirement: Worker article fetch parses an integer
-The worker article handler SHALL parse the message value with parseInt and SHALL request the Público article URL derived from that integer.
+### Requirement: Worker article fetch reads the article URL
+The worker article handler SHALL parse the message value as the article JSON object the manager enqueued and SHALL request the Público article URL on that object.
 
 #### Scenario: Value is a JSON article
-- **WHEN** the value is the JSON object the manager enqueues
-- **THEN** parseInt yields NaN
-- **AND** the HTTP request is not built from an article URL
+- **WHEN** the value is the JSON object the manager enqueues, including a url field
+- **THEN** the HTTP request uses that url
+- **AND** parseInt is not how the URL is chosen
 
 ### Requirement: Observador crawl fans out the current id batches
-The worker SHALL ignore the seed value, fetch the Observador widget, and reply with the most recent article JSON under key MOST_RECENT_ARTICLE_DATA. The manager SHALL split that id with getArticleIdBatches using multiple 1000 and SHALL send every batch in one producer call under key FILTER_ARTICLES. The worker SHALL POST each batch to the Observador fetchbulk endpoint and SHALL emit one FILTERED_ARTICLE_DATA message per returned article.
+The worker SHALL ignore the seed value, fetch the Observador widget, and reply with the most recent article JSON under key MOST_RECENT_ARTICLE_DATA. The manager SHALL split that id with getArticleIdBatches using multiple 1000 and SHALL send FILTER_ARTICLES messages under the outstanding-work cap. The worker SHALL POST each received batch to the Observador fetchbulk endpoint and SHALL emit one FILTERED_ARTICLE_DATA message per returned article.
 
 #### Scenario: Widget reply
 - **WHEN** the manager receives MOST_RECENT_ARTICLE_DATA
-- **THEN** it produces one FILTER_ARTICLES message per batch
-- **AND** it does not wait for a batch to finish before sending the rest
+- **THEN** it produces FILTER_ARTICLES messages only up to the outstanding-work cap
+- **AND** it waits for completions before sending the rest
 
-### Requirement: Id batches neither cover nor cap the id space
-getArticleIdBatches SHALL slice range(1, mostRecent), which includes both ends, into batches whose count is ceil(mostRecent / multiple) + 1. Bounds SHALL be length / multiple times the batch index, truncated with JavaScript ToInteger. multiple SHALL NOT be a maximum batch length. Ids past the last bound SHALL NOT be sent.
+### Requirement: Id batches cover every id up to the newest
+The manager SHALL enqueue FILTER_ARTICLES batches that together contain every integer from 1 through the most recent Observador id, inclusive, with at most 1000 ids in each batch and no gaps or duplicates.
 
 #### Scenario: Id 10 split by 4
-- **WHEN** the most recent id is 10 and multiple is 4
-- **THEN** the batches are [1, 2], [3, 4, 5], [6, 7], and [8, 9, 10]
+- **WHEN** the most recent id is 10 and the batch size is 4
+- **THEN** the batches are [1, 2, 3, 4], [5, 6, 7, 8], and [9, 10]
 
 #### Scenario: Id 2500 split by 1000
-- **WHEN** the most recent id is 2500 and multiple is 1000
-- **THEN** the batches are [1, 2], [3, 4, 5], [6, 7], and [8, 9, 10]
-- **AND** every id above 10 is absent
+- **WHEN** the most recent id is 2500 and the batch size is 1000
+- **THEN** the batches cover every id from 1 through 2500 once
+- **AND** no batch holds more than 1000 ids
 
 ### Requirement: Offsets commit after handlers return
 The application SHALL NOT set autoCommit, autoCommitInterval, or autoCommitThreshold. With kafkajs 1.12 those defaults leave commitOffsetsIfNecessary a no-op, and the fetch loop SHALL commit resolved offsets after the batch. An offset SHALL NOT be resolved before the handler returns. Producer sends SHALL NOT set acks, a transactional id, or the idempotent producer, so the library default acks of -1 and idempotent false apply.
@@ -109,56 +109,57 @@ The application SHALL NOT set autoCommit, autoCommitInterval, or autoCommitThres
 - **WHEN** every handler in the fetch has returned
 - **THEN** the consumer commits the resolved offsets
 
-### Requirement: Handler failures are retried then the consumer restarts
-If a handler throws, the consumer SHALL commit only offsets already resolved in that fetch and SHALL leave the failed offset uncommitted. The consumer SHALL retry that fetch using the kafkajs 1.12 default of 10 retries. When those retries are exhausted the crash path SHALL restart the consumer because the error is KafkaJSNumberOfRetriesExceeded, which reads the same uncommitted message again. The application SHALL NOT cap those restarts.
+### Requirement: Failed handlers retry then dead-letter
+A handler that throws SHALL be retried at most 5 times for that delivery cycle. The failed offset SHALL stay uncommitted until the budget is spent. The consumer SHALL NOT use an uncapped restart loop as the retry policy.
 
 #### Scenario: Handler throws
 - **WHEN** eachMessage throws a non-KafkaJS error
 - **THEN** the failed offset stays uncommitted
 - **AND** earlier resolved offsets in that fetch are committed
-- **AND** the fetch is retried
+- **AND** the same message is attempted again until the budget is spent
 
 #### Scenario: Retries exhausted
-- **WHEN** the tenth retry still fails
-- **THEN** the consumer disconnects and starts again
-- **AND** the same message is delivered again
+- **WHEN** the fifth attempt still throws
+- **THEN** one dead-letter record is appended with the original topic, key, value, and error text
+- **AND** the original offset is committed
+- **AND** the consumer does not restart onto that message
 
-### Requirement: No dead-letter topic
-The application SHALL NOT declare a dead-letter topic, a retry topic, or a poison-message counter. A message that keeps failing SHALL remain the next message for that partition.
+### Requirement: Poison messages are dead-lettered
+The application SHALL declare a dead-letter topic. A message that fails past the retry budget SHALL be appended there once and SHALL NOT remain the next uncommitted message on that partition.
 
 #### Scenario: Permanent handler failure
-- **WHEN** a message makes the handler throw on every delivery
-- **THEN** no dead-letter record is produced
-- **AND** the consumer continues to restart onto that message
+- **WHEN** a message makes the handler throw on every attempt until the budget is spent
+- **THEN** one dead-letter record is produced
+- **AND** the partition advances past that message
 
-### Requirement: No idempotency key
-Produced messages SHALL NOT carry an idempotency key or a deduplication header. A redelivery SHALL run the handler again. Database deduplication that does exist SHALL be a title lookup, not a source article id.
+### Requirement: Article writes are idempotent on source identity
+Each produced article message SHALL carry the outlet and the source article id. A second delivery of the same pair SHALL NOT insert another article row. Title SHALL NOT be the idempotency key.
 
 #### Scenario: Same record delivered twice
-- **WHEN** a committed failure or a killed process causes Kafka to deliver a record again
-- **THEN** the handler runs again with the same key and value
+- **WHEN** the same outlet and source article id are handled twice
+- **THEN** the article table contains one row for that pair
 - **AND** follow-up produces from the first attempt are not recalled
 
-### Requirement: Kill mid-handler does not roll back side effects
-If the process is killed inside a handler, uncommitted offsets SHALL be delivered again after the group session ends. HTTP calls, follow-up produces, and database writes already performed SHALL NOT be rolled back. The application SHALL NOT open a transaction that covers Kafka and Postgres.
+### Requirement: Redelivery after a crash does not duplicate work
+If the process is killed inside a handler, Kafka MAY deliver the uncommitted message again. A replay SHALL NOT append a second result for the same work identity and SHALL NOT leave the system to a manual rollback. Safety SHALL come from idempotent follow-up produces, not from a transaction that covers Kafka and Postgres.
 
 #### Scenario: Worker dies after producing a reply
-- **WHEN** the worker has sent a result message and is then killed before the fetch commits
-- **THEN** the original work message is delivered again
-- **AND** the result message already appended stays on the topic
+- **WHEN** the worker has sent a result and is then killed before the offset commit
+- **THEN** the work message may be delivered again
+- **AND** the result topic contains one result for that work identity
 
 #### Scenario: Manager dies after a database save
 - **WHEN** the manager has saved a row and is killed before the offset commit
-- **THEN** the result message is delivered again
-- **AND** the saved row is not removed
+- **THEN** the result message may be delivered again
+- **AND** the article row count for that source id stays one
 
-### Requirement: Manager restart appends new seeds
-Every manager process start SHALL produce the two seed messages again, including when manager-group already has committed offsets. The new seeds SHALL be additional records. They SHALL NOT replace the log.
+### Requirement: Manager restart resumes the crawl cursor
+The manager SHALL store the next Público page and the Observador batches not yet finished. A later process start SHALL resume that cursor. It SHALL NOT append another page-1 seed or another most-recent seed while the cursor is unfinished.
 
 #### Scenario: Manager pod restarts
-- **WHEN** the manager container starts again after a crash
-- **THEN** another page-1 Público seed and another Observador seed are appended
-- **AND** the group resumes from its committed offsets rather than trimming the log
+- **WHEN** the manager container starts again during a Público crawl that has passed page 1
+- **THEN** it does not append another page-1 seed
+- **AND** the next page it enqueues is the stored cursor
 
 ### Requirement: No application processing deadline
 Manager and worker code SHALL NOT set a per-message timeout. KafkaJS session and request timeouts SHALL remain the library defaults because the application does not pass them. The Deployment manifests SHALL NOT set a probe timeout.
@@ -168,44 +169,53 @@ Manager and worker code SHALL NOT set a per-message timeout. KafkaJS session and
 - **THEN** no application deadline exists to fire
 - **AND** only the library and the broker can interrupt the member
 
-### Requirement: No bound on outstanding crawl work
-The manager SHALL send the full list of Público RETRIEVE_ARTICLE messages in one producer call and the full list of Observador FILTER_ARTICLES messages in one producer call. It SHALL NOT limit in-flight messages, pause the consumer, or sample the broker backlog.
+### Requirement: Outstanding crawl work is bounded
+The manager SHALL keep outstanding RETRIEVE_ARTICLE and FILTER_ARTICLES messages at or below a configured cap. It SHALL send more only as earlier messages of that kind are completed. It SHALL NOT put an entire crawl into one producer call.
 
 #### Scenario: Large Observador id
-- **WHEN** batch splitting returns many batches
-- **THEN** one send contains every batch
-- **AND** the manager does not wait for workers to drain them
+- **WHEN** batch splitting returns more batches than the cap
+- **THEN** the first send contains at most the cap
+- **AND** further batches are sent only as earlier batches complete
 
-### Requirement: Observador saves only when the title query is falsy
-The filtered-article handler SHALL load articles by title and SHALL save only when that result is falsy. It SHALL run the same check the sequential Observador script runs. A TypeORM find result is an array, and an array SHALL count as truthy, including when it is empty, so the save SHALL NOT run.
+### Requirement: Observador articles save when the source id is new
+The filtered-article handler and the sequential Observador script SHALL treat an empty title lookup as missing. They SHALL insert when the outlet and source id are not stored, and SHALL NOT insert when that pair is already stored.
 
 #### Scenario: No stored article
-- **WHEN** find by title returns an empty array
-- **THEN** the handler does not save the article
+- **WHEN** the lookup for that Observador source id finds no row
+- **THEN** the handler saves one article
 
 #### Scenario: Title already stored
-- **WHEN** find by title returns a non-empty array
-- **THEN** the handler does not save the article
+- **WHEN** the same Observador source id is already stored
+- **THEN** the handler does not insert a second row
+- **AND** a different source id is not skipped merely because the title string matches
 
-### Requirement: Público title filter runs only before the article fetch
-On a PAGE_DATA value that is an array, the manager SHALL enqueue RETRIEVE_ARTICLE only for titles that are not already stored. The later ARTICLE_DATA save SHALL NOT repeat that check. The Article entity SHALL declare a unique index on title, and the save path SHALL NOT catch a unique violation.
+### Requirement: Público saves are safe to repeat
+The page handler MAY still skip titles already stored. The article save SHALL also be idempotent on outlet plus source id. A unique violation SHALL be treated as the row already existing, not as a crash.
 
 #### Scenario: Duplicate title on the page
-- **WHEN** a page array contains a title that is already stored
-- **THEN** no RETRIEVE_ARTICLE message is produced for that title
+- **WHEN** a page contains a source id that is already stored
+- **THEN** no second article row is created for that source id
 
 #### Scenario: Redelivered article save
-- **WHEN** ARTICLE_DATA is handled twice for a new title
-- **THEN** both attempts call save
-- **AND** a unique-title failure is not handled in application code
+- **WHEN** ARTICLE_DATA is handled twice for one Público source id
+- **THEN** the article table contains one row
+- **AND** the second save does not surface as an unhandled unique violation
 
-### Requirement: Newspaper link is hardcoded to Observador
-The save path SHALL look up a newspaper named OBSERVADOR only. If that row is missing it SHALL save the article object through the newspaper repository. If the row exists it SHALL attach that Observador row to the article, including when the transformed newspaper name is PUBLICO.
+### Requirement: Articles keep the newspaper named by the transform
+The save path SHALL look up the newspaper named on the transformed article. A missing newspaper SHALL be inserted as a newspaper row with that name and then linked. The path SHALL NOT query only OBSERVADOR and SHALL NOT pass the article object to the newspaper repository.
 
 #### Scenario: Observador row missing
-- **WHEN** an article is saved and no OBSERVADOR newspaper row exists
-- **THEN** the article object is passed to the newspaper repository save
+- **WHEN** the article names PUBLICO and no PUBLICO newspaper row exists
+- **THEN** a PUBLICO newspaper row is inserted and linked
+- **AND** the article is not saved through the newspaper repository
 
 #### Scenario: Observador row exists
-- **WHEN** an article of either outlet is saved and an OBSERVADOR row exists
-- **THEN** the article's newspaper is replaced with that row
+- **WHEN** the article names PUBLICO and an OBSERVADOR newspaper row also exists
+- **THEN** the article's newspaper is the PUBLICO row
+
+### Requirement: Saved rows keep transformed fields
+The object passed to the article repository SHALL include the transformed title, text, date, tags, authors, and newspaper name. `excludeExtraneousValues` SHALL NOT drop those fields.
+
+#### Scenario: Público transform round-trip
+- **WHEN** a transformed Público article is converted for save
+- **THEN** title, text, date, tag names, author names, and newspaper name are still set

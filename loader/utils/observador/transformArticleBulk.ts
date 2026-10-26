@@ -15,6 +15,7 @@ export const transformArticleBulk = (observadorArticleData: ObservadorArticleBul
   
   return {
     title,
+    sourceArticleId: observadorArticleData.sourceArticleId ?? observadorArticleData.id,
     date: new Date(datetime),
     tags: categories.map(tag => ({ name: tag.name })),
     text: content,

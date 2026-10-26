@@ -8,7 +8,7 @@ This repository collects articles from two Portuguese news outlets, Público and
 
 There is no polarisation score, stance label, graph, or distance between outlets. Two separate ingestion paths store articles:
 
-- The Kafka path maps a fetched article into title, date, text, tag names, author names, and a newspaper name (`PUBLICO` or `OBSERVADOR`), then tries to save that through TypeORM.
+- The Kafka path maps a fetched article into title, date, text, tag names, author names, and a newspaper name (`PUBLICO` or `OBSERVADOR`), then saves that through TypeORM. A second save of the same outlet and source article id does not insert another row.
 - The file path maps raw JSON into title, url, text, date, tags, authors, and a newspaper label (`Público` or `Observador`), then writes TSV files.
 
 Those mappings are not the same schema, and neither path builds a network from them.
@@ -28,7 +28,7 @@ Observador:
 - Bulk fetch: `POST https://observador.pt/wp-json/obs_api/v4/news/fetchbulk`
 - Single item, used by `getArticleData` and not by the Kafka crawl: `https://observador.pt/observador_api/req/3_0/items/id/<id>`
 
-The file ETL reads `$RESEARCH/media_networks_polarisation/data/raw/publico.json` and `observador.json`. No program in this repo writes those files. The Kafka loaders and the sequential `loader/scripts/*.ts` scripts save through TypeORM. They do not fill `data/raw`.
+The file ETL reads `$RESEARCH/media_networks_polarisation/data/raw/publico.json` and `observador.json`. `scripts/fetch_raw.sh` writes those two arrays from the recorded fixtures (or from `--from DIR`). The Kafka loaders and the sequential `loader/scripts/*.ts` scripts still save through TypeORM and do not fill `data/raw`.
 
 ## Architecture
 
@@ -58,7 +58,9 @@ flowchart LR
     RetrieveDag[retrieve_news DAG file]
     EtlDag[etl_news DAG file]
     Scripts[loader/scripts sequential fetch]
-    Raw[data/raw JSON, not written by this repo]
+    Fetch[scripts/fetch_raw.sh]
+    Raw[data/raw JSON]
+    Fetch --> Raw
     Jq[scripts/wrangle jq]
     Tsv[data/integrated TSV]
     RetrieveDag --> Scripts
@@ -85,18 +87,18 @@ Público, as the handlers are written:
 
 1. The worker parses the value as a page number, fetches that page's oldest article, and replies with key `RETRIEVED_PAGE_OLDEST_ARTICLE_DATA`.
 2. If that reply still has an oldest article, the manager enqueues `RETRIEVE_PAGE` and `RETRIEVE_PAGE_OLDEST_ARTICLE` for the next page. `constants.publico.lastPage` (`69200`) is never read. An empty page omits `pageOldestArticle` from the JSON and the crawl stops.
-3. The worker's page handler sends one `PAGE_DATA` message per article object. The manager's `PAGE_DATA` handler parses the value and maps it as an array. A single object does not get that far: the `.map` throws, so no `RETRIEVE_ARTICLE` is produced.
-4. When the value is an array, the manager drops titles already stored and enqueues `RETRIEVE_ARTICLE` with the element JSON. The worker runs `parseInt` on that JSON, which is `NaN`, and requests an article URL built from that integer.
+3. The worker's page handler sends one `PAGE_DATA` message whose value is the JSON array of articles on that page.
+4. The manager parses that array, drops titles already stored, and enqueues one `RETRIEVE_ARTICLE` per remaining article, up to `CRAWL_OUTSTANDING_CAP` messages in flight for that outlet. The default cap is 32. The value is that article's JSON, including its `url`. A value that is a single object is not an array: `.map` throws, and no `RETRIEVE_ARTICLE` is produced. When an `ARTICLE_DATA` result is handled, one slot frees and a queued article can be sent.
+5. The worker parses the `RETRIEVE_ARTICLE` JSON and requests `https://www.publico.pt` plus that article's `url`.
 
 Observador:
 
 1. The worker ignores the seed value, calls the widget endpoint, and replies with the newest article under `MOST_RECENT_ARTICLE_DATA`.
-2. The manager splits that id with `getArticleIdBatches(id, 1000)` and sends every batch in one produce, key `FILTER_ARTICLES`.
-3. `1000` is not a batch size. For id `2500` the batches are `[1, 2]`, `[3, 4, 5]`, `[6, 7]`, and `[8, 9, 10]`. Ids above 10 are not requested. See `openspec/specs/distributed-crawl/spec.md`.
-4. The worker POSTs each batch to the bulk endpoint and emits one `FILTERED_ARTICLE_DATA` per returned article.
-5. The manager loads rows by title and saves only when that result is falsy. TypeORM `find` returns an array. An array is truthy even when empty, so this save does not run.
+2. The manager splits ids from 1 through that newest id, inclusive, into contiguous batches of at most 1000 and sends `FILTER_ARTICLES` only until `CRAWL_OUTSTANDING_CAP` batches are outstanding. Further batches wait until a `FILTERED_ARTICLE_DATA` result frees a slot. For id 10 and size 4 the batches are `[1, 2, 3, 4]`, `[5, 6, 7, 8]`, and `[9, 10]`.
+3. The worker POSTs each batch to the bulk endpoint and emits one `FILTERED_ARTICLE_DATA` per returned article.
+4. The worker's filtered-article message carries `outlet` and `sourceArticleId`. The manager saves when that pair is not already stored. An empty lookup inserts one row. A second delivery does not. The same title with a different source id is a different article. The newspaper row is the one named on the transform (`PUBLICO` or `OBSERVADOR`). Title, text, date, tags, authors, and that newspaper name are still set on the object passed to the article repository.
 
-`ArticleDTO.toArticle` uses `excludeExtraneousValues: true`. The entity fields are not `@Expose`d, so those properties are dropped before a save. `addUniqueNewspaper` looks up the newspaper named `OBSERVADOR` only. If that row exists, every article, including Público, is pointed at it. If it does not, the article object is passed to the newspaper repository.
+Público article messages carry the same identity. The page handler may still skip titles already stored before the fetch. The article save is also idempotent on outlet plus source id, and a unique violation is treated as the row already existing.
 
 Producer calls do not set `acks`, a transactional id, or the idempotent producer. kafkajs 1.12 then uses `acks: -1` and `idempotent: false`.
 
@@ -106,50 +108,33 @@ Producer calls do not set `acks`, a transactional id, or the idempotent producer
 
 `pipelines/etl_news.py` runs, in order, `cleanRawData/<outlet>.sh`, `createHeaders.sh`, `joinData.sh`, and `integrateData.sh`, with paths under `$RESEARCH/media_networks_polarisation`.
 
-The clean scripts run jq, then `sed ... file > file`. The shell truncates the file before sed reads it, so `data/clean/<outlet>.json` is empty and the HTML strip never sees the jq output. Join and integrate still do what their jq says when they are given clean JSON by hand: join concatenates every JSON value in `data/clean/*.json`, and integrate writes one TSV per relation. Tags and authors are uniqued by name. Newspaper rows are not.
+The clean scripts run jq into a temporary file, then `sed` strips HTML tags into `data/clean/<outlet>.json`. Join concatenates every JSON value in `data/clean/*.json`, and integrate writes one TSV per relation. Tags and authors are uniqued by name. Newspaper rows are not.
 
 ## Failure handling
 
 Offsets: the application does not set `autoCommit`, `autoCommitInterval`, or `autoCommitThreshold`. In kafkajs 1.12, `commitOffsetsIfNecessary` then does nothing, and the fetch loop commits resolved offsets after the batch. An offset is resolved only after the handler returns.
 
-If the handler throws, earlier offsets in that fetch are committed, the failed offset is not, and the consumer retries the fetch up to the library default of 10 times. When those retries are exhausted the crash path restarts the consumer, because the error is `KafkaJSNumberOfRetriesExceeded`, and the same message is read again. There is no dead-letter topic and no application cap on those restarts. A poison message stalls that partition.
+If the handler throws, that message is tried 5 times. The offset stays uncommitted while those attempts run. When the fifth attempt still throws, the consumer appends one record to `CRAWL_DEAD_LETTER` with the original topic, key, value, and error text, then returns so the offset can commit and the partition moves on. It does not restart onto that message. If the dead-letter produce fails, the error propagates and the offset stays uncommitted. A key this process does not own is ignored and is not dead-lettered. Offsets for messages that already succeeded in the same fetch are committed when the fetch finishes.
 
-If the process is killed inside a handler, the uncommitted message is delivered again after the group session ends. HTTP calls, follow-up produces, and database writes already done are not rolled back. There is no transaction across Kafka and Postgres, and produced messages have no idempotency key.
+If the process is killed inside a handler, the uncommitted message may be delivered again after the group session ends. HTTP calls already done are not rolled back. There is no transaction that covers both Kafka and Postgres. A result is sent once for a work identity (`PUBLICO:page:<n>` or `PUBLICO:article:<id>`): a replay sees that identity in the crawl cursor and does not append a second result. The article save and that cursor update run in one database transaction, and a second save of the same outlet and source id does not insert another row.
 
-Starting the manager again always appends a new page-1 seed and a new Observador seed, including when `manager-group` already has offsets. The Deployment restart policy is the default `Always`, so a container exit runs that startup path again. There is no crawl cursor.
+The manager stores the next Público page and any Observador batches not yet finished. A later start resumes that cursor. It does not append another page-1 seed or another most-recent seed while the cursor is unfinished. The Deployment restart policy is the default `Always`.
 
 The only retry and timeout numbers declared as application settings are on the Airflow DAG files: `retries: 2`, `retry_delay` of 5 minutes, `sla` of 90 minutes, `dagrun_timeout` of 180 minutes. The shell scripts do not retry. Manager and worker code sets no per-message deadline. Those DAG settings apply only when an external Airflow scheduler loads `pipelines/`.
 
 Unknown keys are ignored and then committed. That is how the other group's messages are skipped. It is also how a key neither group owns disappears.
 
-There is no backpressure. The manager sends the whole Público article list and the whole Observador batch list in one `producer.send`.
+`CRAWL_OUTSTANDING_CAP` bounds how many `RETRIEVE_ARTICLE` and `FILTER_ARTICLES` messages are outstanding per outlet. The default is 32. The manager does not put a whole crawl into one `producer.send`. Page-turn messages are not part of that cap.
 
 ## Known gaps
 
-These are absent. The OpenSpec changes under `openspec/changes/` propose them and do not implement them.
-
-| Gap | Where it shows up | Proposal |
-| --- | --- | --- |
-| No application retry budget, and a failing message is retried forever by consumer restart | KafkaJS default of 10 fetch retries, then restart onto the same offset | `retry-failed-messages` |
-| No dead-letter or poison-message handling | No dead-letter topic in code or manifests | `retry-failed-messages` |
-| No idempotency key. Redelivery runs the handler again | Produces set no key for dedup. Title is the only lookup | `idempotent-article-writes` |
-| Observador rows are not saved | `if (!existingArticles)` is false for every array `find` returns | `idempotent-article-writes` |
-| Newspaper is forced to Observador, and transformed fields are dropped on save | `addUniqueNewspaper`, `ArticleDTO.toArticle` | `idempotent-article-writes` |
-| A kill mid-handler duplicates side effects, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional | `crash-safe-crawl-cursor` |
-| No backpressure | One `send` for every batch | `bound-crawl-fanout` |
-| Público page and article payloads do not match across the two processes | Worker sends one object per article; manager maps an array. Worker `parseInt`s the article JSON | `align-crawl-payloads` |
-| Observador id batches drop most ids | `getArticleIdBatches(2500, 1000)` yields only ids 1 through 10 | `cover-observador-id-space` |
-| Clean output is erased, and nothing writes `data/raw` | `sed file > file`. No fetch command | `preserve-cleaned-records` |
-| No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
-| The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |
-
-Also not fixed by those proposals, and not present in the code: `filterArticles` calls `concat` without assigning the result and returns an empty list. No crawl path calls it. The sequential scripts call `getFilteredArticles` directly.
+The proposals under `openspec/changes/` are archived. One defect is still outside those proposals: `filterArticles` calls `concat` without assigning the result and returns an empty list. No crawl path calls it. The sequential scripts call `getFilteredArticles` directly.
 
 Polarisation is not specified, because the code does not compute one. A future definition would be a new spec, not a description of this tree.
 
 ## Running it
 
-Nothing below is a working quick start. The commands in the repo do not match the tree.
+The commands below match the tree. They still need a cluster, a container runtime, and credentials before anything is crawled. This checkout did not create the GKE cluster.
 
 ### Tests, which do run without a cluster
 
@@ -157,51 +142,51 @@ The pytest suite uses checked-in fixtures of at most a few dozen articles per fi
 
 ```bash
 npm ci --prefix loader
-python -m pip install pytest ruff
+python -m pip install pytest ruff pyyaml
 ruff check tests
 pytest -q
 ```
 
-Golden files cover each wrangle step (`clean` for each outlet, headers, join, integrate) and the pure transforms: Público article mapping, both Observador mappings, id batches, and `range`. The clean goldens are empty because that is what those scripts write.
+Golden files cover each wrangle step (`clean` for each outlet, headers, join, integrate) and the pure transforms: Público article mapping, both Observador mappings, id batches, and `range`. The clean goldens are the jq documents after HTML tags are stripped.
 
 `openspec validate --all --strict` checks the specs. CI runs the linter, pytest, and that validate.
 
 ### Skaffold
 
-`loader/skaffold.yaml` has one profile, `development`. From `loader/` the intended command would be:
+`loader/skaffold.yaml` has one profile, `development`. From `loader/`:
 
 ```bash
 skaffold dev -p development
 ```
 
-That config builds contexts `manager`, `worker`, and `entities`, and kustomize paths `k8s/overlays/development/secrets` and `k8s/base`. The Dockerfiles and manifests are under `loader/microservices/`, not those paths. There is no `entities` Dockerfile. The development overlay references `kafka.env`, which is not committed (`loader/.gitignore` ignores `**/*.env`).
+The build context is `loader/`. The Dockerfiles are `microservices/manager/Dockerfile` and `microservices/worker/Dockerfile`. Kustomize uses `microservices/k8s/base`. There is no entities image. The development secrets overlay does not read `kafka.env`.
 
-`loader/deploy.sh` runs `skaffold build -p ci` and `skaffold run -p ci`. The file does not define a `ci` profile.
+`loader/deploy.sh` runs `skaffold build -p development` and `skaffold run -p development`.
 
-Both Dockerfiles `COPY package.json yarn.lock` and `CMD ["yarn", "start"]`. The repo has `package-lock.json`, no `yarn.lock`, and `package.json` has no `start` script.
+Both Dockerfiles `COPY package.json package-lock.json`, run `npm ci`, and `CMD ["npm", "start"]`. `npm start` runs `ts-node` on `microservices/$SERVICE/index.ts`. The manager pod sets `SERVICE=manager` and the worker pod sets `SERVICE=worker`.
 
 ### Kubernetes
 
-`loader/microservices/k8s/infra/up.sh` only creates a GKE cluster named `enterprise-integration` (version `1.16.9-gke.6`, `e2-small`, 3 nodes, zone `europe-west2-a`). It does not apply manifests. `down.sh` deletes that cluster and will prompt.
+`loader/microservices/k8s/infra/up.sh` creates a GKE cluster named `enterprise-integration` (version `1.16.9-gke.6`, `e2-small`, 3 nodes, zone `europe-west2-a`) and then runs `kubectl apply -k` on the base. `down.sh` deletes that cluster and will prompt. The version pin is unchanged.
 
 ```bash
 kubectl apply -k loader/microservices/k8s/base
 ```
 
-fails as checked in: the kustomization lists `entities/entities-cluster-ip-service.yaml` and `entities/entities-deployment.yaml`, and those files are not in the repo.
+`kustomize build` of that directory exits 0. The missing entities manifests were removed from the kustomization rather than added.
 
-What the manifests do declare, for the pods that are present:
+What the manifests declare:
 
-- Manager and worker: one replica each, `KAFKA_HOST=kafka-cluster-ip-service`, `KAFKA_PORT=9092`, no probes, no resource requests or limits, no database environment.
-- Kafka `bitnami/kafka:2.5.0` and ZooKeeper `bitnami/zookeeper:3.6.1`, plaintext, `hostPort` 9092 and 2181, no probes, no resource limits.
-- ZooKeeper's volume `claimName` is `broker-persistent-volume-claim`, the same ReadWriteOnce claim Kafka uses. `registry-persistent-volume-claim` is unused.
-- No Postgres workload. `loader/ormconfig.ts` is Postgres on `localhost` port `3306`, user `test`, password `test`, database `test`, `synchronize: true`, entities glob `entities/*.ts`, which does not match the nested entity files.
+- Manager and worker: one replica each, `KAFKA_HOST=kafka-cluster-ip-service`, `KAFKA_PORT=9092`, `SERVICE`, and `DB_HOST=postgres-cluster-ip-service` with `DB_PORT=5432`. CPU and memory requests and limits are set. Readiness checks `/tmp/consumer-ready`, which the process writes after the consumer group join. Liveness checks that `/tmp/consumer-live` was touched in the last minute.
+- Kafka `bitnami/kafka:2.5.0` and ZooKeeper `bitnami/zookeeper:3.6.1`, plaintext on 9092 and 2181, with tcp probes and resource requests and limits. Neither pod sets `hostPort`.
+- Kafka mounts `broker-persistent-volume-claim`. ZooKeeper mounts `registry-persistent-volume-claim`.
+- Postgres `postgres:12` is a Service named `postgres-cluster-ip-service` on port 5432. `loader/ormconfig.ts` reads `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, defaulting to localhost, port 5432, and database `test` outside the cluster. `synchronize` stays true. The entities glob is `entities/**/*.ts`.
 
 ## `data/`
 
 Tracked paths under `data/` are `.gitkeep` files so the empty directories stay in git. `.gitignore` ignores `data/**` except directories and those `.gitkeep` files. The only commit on this repo never added article files. `.git` is about 248K. `.gitattributes` marks `*.gz` for Git LFS, and there are no LFS objects.
 
-The raw JSON cannot be re-downloaded from a URL in this repo, and no script regenerates a frozen corpus. Re-running the scrapers hits the live sites and still does not write `data/raw`. Because of that, the `.gitkeep` files stay tracked. There is no fetch script and no DVC remote to add: both would pretend a dataset exists.
+There is still no public archive URL. `scripts/fetch_raw.sh` writes `data/raw/publico.json` and `data/raw/observador.json` from the recorded fixtures under `tests/fixtures/etl` (40 articles per outlet), or from a directory passed with `--from`. Set `RESEARCH` to the parent of `media_networks_polarisation` so the path matches the wrangle scripts. Without `RESEARCH` the files land in the repo `data/raw`, which git ignores. The live scrapers still do not write `data/raw`. The `.gitkeep` files stay tracked. There is no DVC remote.
 
 If a corpus is added later, put it in Git LFS (the `*.gz` attribute is already there) or in external storage, and keep it out of ordinary git blobs. This change does not rewrite history. A history rewrite would be a force-push, which is a separate decision, and it is not required to drop data that was never committed.
 
@@ -215,6 +200,7 @@ loader/                  TypeScript loader: entities, transforms, Kafka manager 
   ormconfig.ts           TypeORM Postgres settings
 pipelines/               Airflow DAG files etl_news and retrieve_news
 scripts/wrangle/         jq clean, header, join, and integrate steps
+scripts/fetch_raw.sh     write data/raw from the recorded fixtures
 data/                    empty directory markers only
 openspec/                baseline specs of current behaviour, and change proposals
 tests/                   fixtures, golden files, pytest
@@ -230,4 +216,4 @@ tests/                   fixtures, golden files, pytest
 - `article-transform` — the pure field mappings and `range`
 - `cluster-workload` — what the manifests and image build actually declare
 
-`openspec/changes/` holds the proposals in the table above. They are not applied.
+`openspec/changes/` holds the proposals that are not implemented yet. Archived changes are.

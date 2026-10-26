@@ -1,0 +1,806 @@
+{
+  "article_id": "PUB1000",
+  "url": "/2020/07/01/artigo-0",
+  "title": "Artigo publico 0",
+  "text": "Corpo do artigo 0.",
+  "date": "2020-07-01",
+  "tags": [
+    {
+      "tag_id": "PUB10",
+      "name": "Politica"
+    },
+    {
+      "tag_id": "PUB50",
+      "name": "Tema 0"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB200",
+      "name": "Autor 0"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1001",
+  "url": "/2020/07/02/artigo-1",
+  "title": "Artigo publico 1",
+  "text": "Corpo do artigo 1.",
+  "date": "2020-07-02",
+  "tags": [
+    {
+      "tag_id": "PUB11",
+      "name": "Economia"
+    },
+    {
+      "tag_id": "PUB51",
+      "name": "Tema 1"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB201",
+      "name": "Autor 1"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1010",
+  "url": "/2020/07/11/artigo-10",
+  "title": "Artigo publico 10",
+  "text": "Corpo do artigo 10.",
+  "date": "2020-07-11",
+  "tags": [
+    {
+      "tag_id": "PUB10",
+      "name": "Politica"
+    },
+    {
+      "tag_id": "PUB60",
+      "name": "Tema 10"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB210",
+      "name": "Autor 10"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1011",
+  "url": "/2020/07/12/artigo-11",
+  "title": "Artigo publico 11",
+  "text": "Corpo do artigo 11.",
+  "date": "2020-07-12",
+  "tags": [
+    {
+      "tag_id": "PUB11",
+      "name": "Economia"
+    },
+    {
+      "tag_id": "PUB61",
+      "name": "Tema 11"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB211",
+      "name": "Autor 11"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1012",
+  "url": "/2020/07/13/artigo-12",
+  "title": "Artigo publico 12",
+  "text": "Corpo do artigo 12.",
+  "date": "2020-07-13",
+  "tags": [
+    {
+      "tag_id": "PUB12",
+      "name": "Cultura"
+    },
+    {
+      "tag_id": "PUB62",
+      "name": "Tema 12"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB212",
+      "name": "Autor 12"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1013",
+  "url": "/2020/07/14/artigo-13",
+  "title": "Artigo publico 13",
+  "text": "Corpo do artigo 13.",
+  "date": "2020-07-14",
+  "tags": [
+    {
+      "tag_id": "PUB13",
+      "name": "Desporto"
+    },
+    {
+      "tag_id": "PUB63",
+      "name": "Tema 13"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB213",
+      "name": "Autor 13"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1014",
+  "url": "/2020/07/15/artigo-14",
+  "title": "Artigo publico 14",
+  "text": "Corpo do artigo 14.",
+  "date": "2020-07-15",
+  "tags": [
+    {
+      "tag_id": "PUB14",
+      "name": "Sociedade"
+    },
+    {
+      "tag_id": "PUB64",
+      "name": "Tema 14"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB214",
+      "name": "Autor 14"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1015",
+  "url": "/2020/07/16/artigo-15",
+  "title": "Artigo publico 15",
+  "text": "Corpo do artigo 15.",
+  "date": "2020-07-16",
+  "tags": [
+    {
+      "tag_id": "PUB10",
+      "name": "Politica"
+    },
+    {
+      "tag_id": "PUB65",
+      "name": "Tema 15"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB215",
+      "name": "Autor 15"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1016",
+  "url": "/2020/07/17/artigo-16",
+  "title": "Artigo publico 16",
+  "text": "Corpo do artigo 16.",
+  "date": "2020-07-17",
+  "tags": [
+    {
+      "tag_id": "PUB11",
+      "name": "Economia"
+    },
+    {
+      "tag_id": "PUB66",
+      "name": "Tema 16"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB216",
+      "name": "Autor 16"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1017",
+  "url": "/2020/07/18/artigo-17",
+  "title": "Artigo publico 17",
+  "text": "Corpo do artigo 17.",
+  "date": "2020-07-18",
+  "tags": [
+    {
+      "tag_id": "PUB12",
+      "name": "Cultura"
+    },
+    {
+      "tag_id": "PUB67",
+      "name": "Tema 17"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB217",
+      "name": "Autor 17"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1018",
+  "url": "/2020/07/19/artigo-18",
+  "title": "Artigo publico 18",
+  "text": "Corpo do artigo 18.",
+  "date": "2020-07-19",
+  "tags": [
+    {
+      "tag_id": "PUB13",
+      "name": "Desporto"
+    },
+    {
+      "tag_id": "PUB68",
+      "name": "Tema 18"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB218",
+      "name": "Autor 18"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1019",
+  "url": "/2020/07/20/artigo-19",
+  "title": "Artigo publico 19",
+  "text": "Corpo do artigo 19.",
+  "date": "2020-07-20",
+  "tags": [
+    {
+      "tag_id": "PUB14",
+      "name": "Sociedade"
+    },
+    {
+      "tag_id": "PUB69",
+      "name": "Tema 19"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB219",
+      "name": "Autor 19"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1002",
+  "url": "/2020/07/03/artigo-2",
+  "title": "Artigo publico 2",
+  "text": "Corpo do artigo 2.",
+  "date": "2020-07-03",
+  "tags": [
+    {
+      "tag_id": "PUB12",
+      "name": "Cultura"
+    },
+    {
+      "tag_id": "PUB52",
+      "name": "Tema 2"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB202",
+      "name": "Autor 2"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1020",
+  "url": "/2020/07/21/artigo-20",
+  "title": "Artigo publico 20",
+  "text": "Corpo do artigo 20.",
+  "date": "2020-07-21",
+  "tags": [
+    {
+      "tag_id": "PUB10",
+      "name": "Politica"
+    },
+    {
+      "tag_id": "PUB70",
+      "name": "Tema 20"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB220",
+      "name": "Autor 20"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1021",
+  "url": "/2020/07/22/artigo-21",
+  "title": "Artigo publico 21",
+  "text": "Corpo do artigo 21.",
+  "date": "2020-07-22",
+  "tags": [
+    {
+      "tag_id": "PUB11",
+      "name": "Economia"
+    },
+    {
+      "tag_id": "PUB71",
+      "name": "Tema 21"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB221",
+      "name": "Autor 21"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1022",
+  "url": "/2020/07/23/artigo-22",
+  "title": "Artigo publico 22",
+  "text": "Corpo do artigo 22.",
+  "date": "2020-07-23",
+  "tags": [
+    {
+      "tag_id": "PUB12",
+      "name": "Cultura"
+    },
+    {
+      "tag_id": "PUB72",
+      "name": "Tema 22"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB222",
+      "name": "Autor 22"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1023",
+  "url": "/2020/07/24/artigo-23",
+  "title": "Artigo publico 23",
+  "text": "Corpo do artigo 23.",
+  "date": "2020-07-24",
+  "tags": [
+    {
+      "tag_id": "PUB13",
+      "name": "Desporto"
+    },
+    {
+      "tag_id": "PUB73",
+      "name": "Tema 23"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB223",
+      "name": "Autor 23"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1024",
+  "url": "/2020/07/25/artigo-24",
+  "title": "Artigo publico 24",
+  "text": "Corpo do artigo 24.",
+  "date": "2020-07-25",
+  "tags": [
+    {
+      "tag_id": "PUB14",
+      "name": "Sociedade"
+    },
+    {
+      "tag_id": "PUB74",
+      "name": "Tema 24"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB224",
+      "name": "Autor 24"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1025",
+  "url": "/2020/07/26/artigo-25",
+  "title": "Artigo publico 25",
+  "text": "Corpo do artigo 25.",
+  "date": "2020-07-26",
+  "tags": [
+    {
+      "tag_id": "PUB10",
+      "name": "Politica"
+    },
+    {
+      "tag_id": "PUB75",
+      "name": "Tema 25"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB225",
+      "name": "Autor 25"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1026",
+  "url": "/2020/07/27/artigo-26",
+  "title": "Artigo publico 26",
+  "text": "Corpo do artigo 26.",
+  "date": "2020-07-27",
+  "tags": [
+    {
+      "tag_id": "PUB11",
+      "name": "Economia"
+    },
+    {
+      "tag_id": "PUB76",
+      "name": "Tema 26"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB226",
+      "name": "Autor 26"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1027",
+  "url": "/2020/07/28/artigo-27",
+  "title": "Artigo publico 27",
+  "text": "Corpo do artigo 27.",
+  "date": "2020-07-28",
+  "tags": [
+    {
+      "tag_id": "PUB12",
+      "name": "Cultura"
+    },
+    {
+      "tag_id": "PUB77",
+      "name": "Tema 27"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB227",
+      "name": "Autor 27"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1028",
+  "url": "/2020/07/29/artigo-28",
+  "title": "Artigo publico 28",
+  "text": "Corpo do artigo 28.",
+  "date": "2020-07-01",
+  "tags": [
+    {
+      "tag_id": "PUB13",
+      "name": "Desporto"
+    },
+    {
+      "tag_id": "PUB78",
+      "name": "Tema 28"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB228",
+      "name": "Autor 28"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1029",
+  "url": "/2020/07/30/artigo-29",
+  "title": "Artigo publico 29",
+  "text": "Corpo do artigo 29.",
+  "date": "2020-07-02",
+  "tags": [
+    {
+      "tag_id": "PUB14",
+      "name": "Sociedade"
+    },
+    {
+      "tag_id": "PUB79",
+      "name": "Tema 29"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB229",
+      "name": "Autor 29"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1003",
+  "url": "/2020/07/04/artigo-3",
+  "title": "Artigo publico 3",
+  "text": "Corpo do artigo 3.",
+  "date": "2020-07-04",
+  "tags": [
+    {
+      "tag_id": "PUB13",
+      "name": "Desporto"
+    },
+    {
+      "tag_id": "PUB53",
+      "name": "Tema 3"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB203",
+      "name": "Autor 3"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1004",
+  "url": "/2020/07/05/artigo-4",
+  "title": "Artigo publico 4",
+  "text": "Corpo do artigo 4.",
+  "date": "2020-07-05",
+  "tags": [
+    {
+      "tag_id": "PUB14",
+      "name": "Sociedade"
+    },
+    {
+      "tag_id": "PUB54",
+      "name": "Tema 4"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB204",
+      "name": "Autor 4"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1005",
+  "url": "/2020/07/06/artigo-5",
+  "title": "Artigo publico 5",
+  "text": "Corpo do artigo 5.",
+  "date": "2020-07-06",
+  "tags": [
+    {
+      "tag_id": "PUB10",
+      "name": "Politica"
+    },
+    {
+      "tag_id": "PUB55",
+      "name": "Tema 5"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB205",
+      "name": "Autor 5"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1006",
+  "url": "/2020/07/07/artigo-6",
+  "title": "Artigo publico 6",
+  "text": "Corpo do artigo 6.",
+  "date": "2020-07-07",
+  "tags": [
+    {
+      "tag_id": "PUB11",
+      "name": "Economia"
+    },
+    {
+      "tag_id": "PUB56",
+      "name": "Tema 6"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB206",
+      "name": "Autor 6"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1007",
+  "url": "/2020/07/08/artigo-7",
+  "title": "Artigo publico 7",
+  "text": "Corpo do artigo 7.",
+  "date": "2020-07-08",
+  "tags": [
+    {
+      "tag_id": "PUB12",
+      "name": "Cultura"
+    },
+    {
+      "tag_id": "PUB57",
+      "name": "Tema 7"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB207",
+      "name": "Autor 7"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1008",
+  "url": "/2020/07/09/artigo-8",
+  "title": "Artigo publico 8",
+  "text": "Corpo do artigo 8.",
+  "date": "2020-07-09",
+  "tags": [
+    {
+      "tag_id": "PUB13",
+      "name": "Desporto"
+    },
+    {
+      "tag_id": "PUB58",
+      "name": "Tema 8"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB208",
+      "name": "Autor 8"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB1009",
+  "url": "/2020/07/10/artigo-9",
+  "title": "Artigo publico 9",
+  "text": "Corpo do artigo 9.",
+  "date": "2020-07-10",
+  "tags": [
+    {
+      "tag_id": "PUB14",
+      "name": "Sociedade"
+    },
+    {
+      "tag_id": "PUB59",
+      "name": "Tema 9"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB209",
+      "name": "Autor 9"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
+{
+  "article_id": "PUB9007",
+  "url": "/2020/07/08/artigo-7",
+  "title": "com html",
+  "text": "Olá mundo",
+  "date": "2020-07-08",
+  "tags": [
+    {
+      "tag_id": "PUB12",
+      "name": "Cultura"
+    },
+    {
+      "tag_id": "PUB57",
+      "name": "Tema 7"
+    }
+  ],
+  "authors": [
+    {
+      "author_id": "PUB207",
+      "name": "Autor 7"
+    }
+  ],
+  "newspapers": [
+    "Público"
+  ]
+}
