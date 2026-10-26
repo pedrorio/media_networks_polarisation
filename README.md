@@ -116,9 +116,9 @@ Offsets: the application does not set `autoCommit`, `autoCommitInterval`, or `au
 
 If the handler throws, that message is tried 5 times. The offset stays uncommitted while those attempts run. When the fifth attempt still throws, the consumer appends one record to `CRAWL_DEAD_LETTER` with the original topic, key, value, and error text, then returns so the offset can commit and the partition moves on. It does not restart onto that message. If the dead-letter produce fails, the error propagates and the offset stays uncommitted. A key this process does not own is ignored and is not dead-lettered. Offsets for messages that already succeeded in the same fetch are committed when the fetch finishes.
 
-If the process is killed inside a handler, the uncommitted message is delivered again after the group session ends. HTTP calls and follow-up produces already done are not rolled back. There is no transaction across Kafka and Postgres. Article messages carry the outlet and the source article id, so the save of that pair does not insert a second row. The Kafka producer itself is still not idempotent, and a replay does not recall the follow-up produces from the first attempt.
+If the process is killed inside a handler, the uncommitted message may be delivered again after the group session ends. HTTP calls already done are not rolled back. There is no transaction that covers both Kafka and Postgres. A result is sent once for a work identity (`PUBLICO:page:<n>` or `PUBLICO:article:<id>`): a replay sees that identity in the crawl cursor and does not append a second result. The article save and that cursor update run in one database transaction, and a second save of the same outlet and source id does not insert another row.
 
-Starting the manager again always appends a new page-1 seed and a new Observador seed, including when `manager-group` already has offsets. The Deployment restart policy is the default `Always`, so a container exit runs that startup path again. There is no crawl cursor.
+The manager stores the next Público page and any Observador batches not yet finished. A later start resumes that cursor. It does not append another page-1 seed or another most-recent seed while the cursor is unfinished. The Deployment restart policy is the default `Always`.
 
 The only retry and timeout numbers declared as application settings are on the Airflow DAG files: `retries: 2`, `retry_delay` of 5 minutes, `sla` of 90 minutes, `dagrun_timeout` of 180 minutes. The shell scripts do not retry. Manager and worker code sets no per-message deadline. Those DAG settings apply only when an external Airflow scheduler loads `pipelines/`.
 
@@ -132,7 +132,6 @@ Open changes under `openspec/changes/` are not implemented. Archived changes are
 
 | Gap | Where it shows up | Proposal |
 | --- | --- | --- |
-| A kill mid-handler repeats HTTP calls and follow-up produces, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional. The article row itself is not duplicated | `crash-safe-crawl-cursor` |
 | No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
 | The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |
 

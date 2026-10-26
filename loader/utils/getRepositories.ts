@@ -3,6 +3,7 @@ import {Tag} from "../entities/tag/tag.entity"
 import {Article} from "../entities/article/article.entity"
 import {Author} from "../entities/author/author.entity"
 import {Newspaper} from "../entities/newspaper/newspaper.entity"
+import { CrawlCursor } from "../entities/crawl/crawl-cursor.entity"
 
 export const getRepositories = async () => {
 	const connection = await createConnection();
@@ -11,6 +12,7 @@ export const getRepositories = async () => {
 	const tagRepository: Repository<Tag> = connection.getRepository(Tag);
 	const authorRepository: Repository<Author> = connection.getRepository(Author);
 	const newspaperRepository: Repository<Newspaper> = connection.getRepository(Newspaper);
+	const cursorRepository: Repository<CrawlCursor> = connection.getRepository(CrawlCursor);
 
-	return {connection, articleRepository, tagRepository, authorRepository, newspaperRepository};
+	return {connection, articleRepository, tagRepository, authorRepository, newspaperRepository, cursorRepository};
 }
