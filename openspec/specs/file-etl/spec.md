@@ -50,16 +50,18 @@ The etl_news DAG SHALL run, in order, cleanRawData for publico and observador, c
 - **AND** create_headers is upstream of join_clean_data
 - **AND** join_clean_data is upstream of integrate_composite_data
 
-### Requirement: Clean scripts erase the jq output
-Each clean script SHALL write jq output to data/clean/<outlet>.json and SHALL then redirect sed onto that same path. The shell SHALL truncate the file before sed reads it, so the cleaned file SHALL be empty. HTML that jq copied SHALL NOT remain on disk.
+### Requirement: Clean scripts keep the jq documents
+Each clean script SHALL write the jq documents to data/clean/<outlet>.json and SHALL strip HTML tags from that text without truncating the file first. The cleaned file SHALL contain those documents. It SHALL NOT be empty when jq emitted any.
 
 #### Scenario: Público clean
-- **WHEN** cleanRawData/publico.sh runs against a non-empty raw array
-- **THEN** data/clean/publico.json exists and has size 0
+- **WHEN** cleanRawData/publico.sh runs against a non-empty raw array that jq keeps
+- **THEN** data/clean/publico.json contains those jq documents
+- **AND** its size is greater than 0
 
 #### Scenario: Observador clean
-- **WHEN** cleanRawData/observador.sh runs against a non-empty raw array
-- **THEN** data/clean/observador.json exists and has size 0
+- **WHEN** cleanRawData/observador.sh runs against a non-empty raw array that jq keeps
+- **THEN** data/clean/observador.json contains those jq documents
+- **AND** its size is greater than 0
 
 ### Requirement: Clean jq filters use the raw outlet fields
 The Público jq filter SHALL read titulo, texto, data, url, tags[].nome, and autores[].contribuicao, and SHALL keep text authors only. The Observador jq filter SHALL read fullTitle, links.webUri, body, pubDate, and metadata topics and authors whose creditType array contains text. Both filters SHALL drop records missing text, date, authors, or tags. This jq output is what the clean script produces before the sed redirection erases it.
@@ -96,10 +98,10 @@ integrateData.sh SHALL read data/composite/data.json and SHALL write articles, t
 - **THEN** newspapers.tsv has two Público lines
 - **AND** tags.tsv lists each distinct tag name once
 
-### Requirement: No code writes the raw files the clean step reads
-No TypeScript, Python, or shell file in the repo SHALL write data/raw/publico.json or data/raw/observador.json. The clean step SHALL fail if those paths are absent. There SHALL be no checked-in corpus and no download URL for one.
+### Requirement: A command writes the raw files the clean step reads
+The repo SHALL contain a command that writes data/raw/publico.json and data/raw/observador.json as JSON arrays in the shape the clean jq filters read. The clean step SHALL be able to follow that command without a hand-placed file.
 
 #### Scenario: Fresh checkout
-- **WHEN** the repo is cloned and the clean script runs without a hand-placed raw file
-- **THEN** jq has no raw input to read
-- **AND** no fetch script is present to create one
+- **WHEN** that command is run on a checkout that has no raw files
+- **THEN** both raw JSON arrays exist
+- **AND** the clean jq filters can read them
