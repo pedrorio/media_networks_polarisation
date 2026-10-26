@@ -88,13 +88,13 @@ Público, as the handlers are written:
 1. The worker parses the value as a page number, fetches that page's oldest article, and replies with key `RETRIEVED_PAGE_OLDEST_ARTICLE_DATA`.
 2. If that reply still has an oldest article, the manager enqueues `RETRIEVE_PAGE` and `RETRIEVE_PAGE_OLDEST_ARTICLE` for the next page. `constants.publico.lastPage` (`69200`) is never read. An empty page omits `pageOldestArticle` from the JSON and the crawl stops.
 3. The worker's page handler sends one `PAGE_DATA` message whose value is the JSON array of articles on that page.
-4. The manager parses that array, drops titles already stored, and enqueues one `RETRIEVE_ARTICLE` per remaining article. The value is that article's JSON, including its `url`. A value that is a single object is not an array: `.map` throws, and no `RETRIEVE_ARTICLE` is produced.
+4. The manager parses that array, drops titles already stored, and enqueues one `RETRIEVE_ARTICLE` per remaining article, up to `CRAWL_OUTSTANDING_CAP` messages in flight for that outlet. The default cap is 32. The value is that article's JSON, including its `url`. A value that is a single object is not an array: `.map` throws, and no `RETRIEVE_ARTICLE` is produced. When an `ARTICLE_DATA` result is handled, one slot frees and a queued article can be sent.
 5. The worker parses the `RETRIEVE_ARTICLE` JSON and requests `https://www.publico.pt` plus that article's `url`.
 
 Observador:
 
 1. The worker ignores the seed value, calls the widget endpoint, and replies with the newest article under `MOST_RECENT_ARTICLE_DATA`.
-2. The manager splits ids from 1 through that newest id, inclusive, into contiguous batches of at most 1000 and sends every batch in one produce, key `FILTER_ARTICLES`. For id 10 and size 4 the batches are `[1, 2, 3, 4]`, `[5, 6, 7, 8]`, and `[9, 10]`.
+2. The manager splits ids from 1 through that newest id, inclusive, into contiguous batches of at most 1000 and sends `FILTER_ARTICLES` only until `CRAWL_OUTSTANDING_CAP` batches are outstanding. Further batches wait until a `FILTERED_ARTICLE_DATA` result frees a slot. For id 10 and size 4 the batches are `[1, 2, 3, 4]`, `[5, 6, 7, 8]`, and `[9, 10]`.
 3. The worker POSTs each batch to the bulk endpoint and emits one `FILTERED_ARTICLE_DATA` per returned article.
 4. The worker's filtered-article message carries `outlet` and `sourceArticleId`. The manager saves when that pair is not already stored. An empty lookup inserts one row. A second delivery does not. The same title with a different source id is a different article. The newspaper row is the one named on the transform (`PUBLICO` or `OBSERVADOR`). Title, text, date, tags, authors, and that newspaper name are still set on the object passed to the article repository.
 
@@ -124,7 +124,7 @@ The only retry and timeout numbers declared as application settings are on the A
 
 Unknown keys are ignored and then committed. That is how the other group's messages are skipped. It is also how a key neither group owns disappears.
 
-There is no backpressure. The manager sends the whole Público article list and the whole Observador batch list in one `producer.send`.
+`CRAWL_OUTSTANDING_CAP` bounds how many `RETRIEVE_ARTICLE` and `FILTER_ARTICLES` messages are outstanding per outlet. The default is 32. The manager does not put a whole crawl into one `producer.send`. Page-turn messages are not part of that cap.
 
 ## Known gaps
 
@@ -133,7 +133,6 @@ Open changes under `openspec/changes/` are not implemented. Archived changes are
 | Gap | Where it shows up | Proposal |
 | --- | --- | --- |
 | A kill mid-handler repeats HTTP calls and follow-up produces, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional. The article row itself is not duplicated | `crash-safe-crawl-cursor` |
-| No backpressure | One `send` for every batch | `bound-crawl-fanout` |
 | No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
 | The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |
 

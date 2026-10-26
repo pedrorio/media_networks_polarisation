@@ -1,9 +1,11 @@
 import { Publico } from "../../../../utils/publico";
-import { KafkaMessage } from "kafkajs";
+import { KafkaMessage, Producer } from "kafkajs";
 import { ArticleDTO } from "../../../../entities/article/article.dto";
+import { completeCrawlWork, crawlFanout } from "../../../../utils/crawlFanout";
 import { saveNewArticle } from "../../../../utils/saveNewArticle";
 
-export const retrievedArticleData = async (message: KafkaMessage): Promise<void> => {
+export const retrievedArticleData = async (message: KafkaMessage, managerProducer: Producer): Promise<void> => {
   const article = ArticleDTO.toArticle(Publico.transformArticle(JSON.parse(message.value.toString())));
   await saveNewArticle(article);
+  await completeCrawlWork(crawlFanout, "PUBLICO", managerProducer);
 };

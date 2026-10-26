@@ -3,6 +3,7 @@ import { messages, topics } from "../../../../constants";
 import { KafkaMessage, Producer } from "kafkajs";
 import { In } from "typeorm";
 import { getRepositories } from "../../../../utils";
+import { crawlFanout, enqueueCrawlWork } from "../../../../utils/crawlFanout";
 import { PublicoArticle } from "../../../../typings/publico/article.type";
 
 export const retrievedPageData = async (message: KafkaMessage, managerProducer: Producer): Promise<void> => {
@@ -21,11 +22,14 @@ export const retrievedPageData = async (message: KafkaMessage, managerProducer: 
     (item) => !existingTitles.includes(item.title || ""),
   );
 
-  await managerProducer.send({
-    topic: topics.PUBLICO,
-    messages: filteredArticles.map((item) => ({
+  await enqueueCrawlWork(
+    crawlFanout,
+    "PUBLICO",
+    topics.PUBLICO,
+    filteredArticles.map((item) => ({
       value: JSON.stringify(item.article),
       key: messages.PUBLICO.RETRIEVE_ARTICLE,
     })),
-  });
+    managerProducer,
+  );
 };
