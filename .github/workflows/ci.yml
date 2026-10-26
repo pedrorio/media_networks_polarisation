@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Install Python tools
+        run: python -m pip install pytest ruff
+
+      - name: Install loader dependencies
+        working-directory: loader
+        run: npm ci
+
+      - name: Lint tests
+        run: ruff check tests
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Validate OpenSpec
+        env:
+          OPENSPEC_TELEMETRY: "0"
+        run: |
+          npm install --prefix "$HOME/.local" @fission-ai/openspec@1.15.0
+          "$HOME/.local/node_modules/.bin/openspec" validate --all --strict --no-interactive

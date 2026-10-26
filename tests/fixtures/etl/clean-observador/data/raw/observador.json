@@ -1,0 +1,1029 @@
+[
+  {
+    "id": 3000,
+    "fullTitle": "Artigo observador 0",
+    "links": {
+      "webUri": "https://observador.pt/artigo-0"
+    },
+    "body": "Corpo observador 0.",
+    "pubDate": "2020-08-01T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 400,
+          "name": "Jornalista 0",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3001,
+    "fullTitle": "Artigo observador 1",
+    "links": {
+      "webUri": "https://observador.pt/artigo-1"
+    },
+    "body": "Corpo observador 1.",
+    "pubDate": "2020-08-02T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 401,
+          "name": "Jornalista 1",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3002,
+    "fullTitle": "Artigo observador 2",
+    "links": {
+      "webUri": "https://observador.pt/artigo-2"
+    },
+    "body": "Corpo observador 2.",
+    "pubDate": "2020-08-03T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 2,
+          "name": "Mundo"
+        }
+      ],
+      "authors": [
+        {
+          "id": 402,
+          "name": "Jornalista 2",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3003,
+    "fullTitle": "Artigo observador 3",
+    "links": {
+      "webUri": "https://observador.pt/artigo-3"
+    },
+    "body": "Corpo observador 3.",
+    "pubDate": "2020-08-04T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 403,
+          "name": "Jornalista 3",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3004,
+    "fullTitle": "Artigo observador 4",
+    "links": {
+      "webUri": "https://observador.pt/artigo-4"
+    },
+    "body": "Corpo observador 4.",
+    "pubDate": "2020-08-05T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 404,
+          "name": "Jornalista 4",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3005,
+    "fullTitle": "Artigo observador 5",
+    "links": {
+      "webUri": "https://observador.pt/artigo-5"
+    },
+    "body": "Corpo observador 5.",
+    "pubDate": "2020-08-06T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 405,
+          "name": "Jornalista 5",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3006,
+    "fullTitle": "Artigo observador 6",
+    "links": {
+      "webUri": "https://observador.pt/artigo-6"
+    },
+    "body": "Corpo observador 6.",
+    "pubDate": "2020-08-07T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 2,
+          "name": "Mundo"
+        }
+      ],
+      "authors": [
+        {
+          "id": 406,
+          "name": "Jornalista 6",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3007,
+    "fullTitle": "Artigo observador 7",
+    "links": {
+      "webUri": "https://observador.pt/artigo-7"
+    },
+    "body": "Corpo observador 7.",
+    "pubDate": "2020-08-08T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 407,
+          "name": "Jornalista 7",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3008,
+    "fullTitle": "Artigo observador 8",
+    "links": {
+      "webUri": "https://observador.pt/artigo-8"
+    },
+    "body": "Corpo observador 8.",
+    "pubDate": "2020-08-09T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 408,
+          "name": "Jornalista 8",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3009,
+    "fullTitle": "Artigo observador 9",
+    "links": {
+      "webUri": "https://observador.pt/artigo-9"
+    },
+    "body": "Corpo observador 9.",
+    "pubDate": "2020-08-10T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 409,
+          "name": "Jornalista 9",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3010,
+    "fullTitle": "Artigo observador 10",
+    "links": {
+      "webUri": "https://observador.pt/artigo-10"
+    },
+    "body": "Corpo observador 10.",
+    "pubDate": "2020-08-11T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 2,
+          "name": "Mundo"
+        }
+      ],
+      "authors": [
+        {
+          "id": 410,
+          "name": "Jornalista 10",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3011,
+    "fullTitle": "Artigo observador 11",
+    "links": {
+      "webUri": "https://observador.pt/artigo-11"
+    },
+    "body": "Corpo observador 11.",
+    "pubDate": "2020-08-12T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 411,
+          "name": "Jornalista 11",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3012,
+    "fullTitle": "Artigo observador 12",
+    "links": {
+      "webUri": "https://observador.pt/artigo-12"
+    },
+    "body": "Corpo observador 12.",
+    "pubDate": "2020-08-13T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 412,
+          "name": "Jornalista 12",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3013,
+    "fullTitle": "Artigo observador 13",
+    "links": {
+      "webUri": "https://observador.pt/artigo-13"
+    },
+    "body": "Corpo observador 13.",
+    "pubDate": "2020-08-14T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 413,
+          "name": "Jornalista 13",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3014,
+    "fullTitle": "Artigo observador 14",
+    "links": {
+      "webUri": "https://observador.pt/artigo-14"
+    },
+    "body": "Corpo observador 14.",
+    "pubDate": "2020-08-15T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 2,
+          "name": "Mundo"
+        }
+      ],
+      "authors": [
+        {
+          "id": 414,
+          "name": "Jornalista 14",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3015,
+    "fullTitle": "Artigo observador 15",
+    "links": {
+      "webUri": "https://observador.pt/artigo-15"
+    },
+    "body": "Corpo observador 15.",
+    "pubDate": "2020-08-16T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 415,
+          "name": "Jornalista 15",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3016,
+    "fullTitle": "Artigo observador 16",
+    "links": {
+      "webUri": "https://observador.pt/artigo-16"
+    },
+    "body": "Corpo observador 16.",
+    "pubDate": "2020-08-17T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 416,
+          "name": "Jornalista 16",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3017,
+    "fullTitle": "Artigo observador 17",
+    "links": {
+      "webUri": "https://observador.pt/artigo-17"
+    },
+    "body": "Corpo observador 17.",
+    "pubDate": "2020-08-18T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 417,
+          "name": "Jornalista 17",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3018,
+    "fullTitle": "Artigo observador 18",
+    "links": {
+      "webUri": "https://observador.pt/artigo-18"
+    },
+    "body": "Corpo observador 18.",
+    "pubDate": "2020-08-19T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 2,
+          "name": "Mundo"
+        }
+      ],
+      "authors": [
+        {
+          "id": 418,
+          "name": "Jornalista 18",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3019,
+    "fullTitle": "Artigo observador 19",
+    "links": {
+      "webUri": "https://observador.pt/artigo-19"
+    },
+    "body": "Corpo observador 19.",
+    "pubDate": "2020-08-20T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 419,
+          "name": "Jornalista 19",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3020,
+    "fullTitle": "Artigo observador 20",
+    "links": {
+      "webUri": "https://observador.pt/artigo-20"
+    },
+    "body": "Corpo observador 20.",
+    "pubDate": "2020-08-21T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 420,
+          "name": "Jornalista 20",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3021,
+    "fullTitle": "Artigo observador 21",
+    "links": {
+      "webUri": "https://observador.pt/artigo-21"
+    },
+    "body": "Corpo observador 21.",
+    "pubDate": "2020-08-22T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 421,
+          "name": "Jornalista 21",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3022,
+    "fullTitle": "Artigo observador 22",
+    "links": {
+      "webUri": "https://observador.pt/artigo-22"
+    },
+    "body": "Corpo observador 22.",
+    "pubDate": "2020-08-23T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 2,
+          "name": "Mundo"
+        }
+      ],
+      "authors": [
+        {
+          "id": 422,
+          "name": "Jornalista 22",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3023,
+    "fullTitle": "Artigo observador 23",
+    "links": {
+      "webUri": "https://observador.pt/artigo-23"
+    },
+    "body": "Corpo observador 23.",
+    "pubDate": "2020-08-24T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 423,
+          "name": "Jornalista 23",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3024,
+    "fullTitle": "Artigo observador 24",
+    "links": {
+      "webUri": "https://observador.pt/artigo-24"
+    },
+    "body": "Corpo observador 24.",
+    "pubDate": "2020-08-25T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 424,
+          "name": "Jornalista 24",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3025,
+    "fullTitle": "Artigo observador 25",
+    "links": {
+      "webUri": "https://observador.pt/artigo-25"
+    },
+    "body": "Corpo observador 25.",
+    "pubDate": "2020-08-26T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 425,
+          "name": "Jornalista 25",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3026,
+    "fullTitle": "Artigo observador 26",
+    "links": {
+      "webUri": "https://observador.pt/artigo-26"
+    },
+    "body": "Corpo observador 26.",
+    "pubDate": "2020-08-27T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 2,
+          "name": "Mundo"
+        }
+      ],
+      "authors": [
+        {
+          "id": 426,
+          "name": "Jornalista 26",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3027,
+    "fullTitle": "Artigo observador 27",
+    "links": {
+      "webUri": "https://observador.pt/artigo-27"
+    },
+    "body": "Corpo observador 27.",
+    "pubDate": "2020-08-28T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 427,
+          "name": "Jornalista 27",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3028,
+    "fullTitle": "Artigo observador 28",
+    "links": {
+      "webUri": "https://observador.pt/artigo-28"
+    },
+    "body": "Corpo observador 28.",
+    "pubDate": "2020-08-01T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 428,
+          "name": "Jornalista 28",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3029,
+    "fullTitle": "Artigo observador 29",
+    "links": {
+      "webUri": "https://observador.pt/artigo-29"
+    },
+    "body": "Corpo observador 29.",
+    "pubDate": "2020-08-02T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 429,
+          "name": "Jornalista 29",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3000,
+    "fullTitle": "id repetido",
+    "links": {
+      "webUri": "https://observador.pt/artigo-0"
+    },
+    "body": "Corpo observador 0.",
+    "pubDate": "2020-08-01T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 400,
+          "name": "Jornalista 0",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 8001,
+    "fullTitle": "Artigo observador 1",
+    "links": {
+      "webUri": "https://observador.pt/artigo-1"
+    },
+    "body": "Corpo observador 1.",
+    "pubDate": "2020-08-02T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 401,
+          "name": "Jornalista 1",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 8002,
+    "fullTitle": "sem corpo",
+    "links": {
+      "webUri": "https://observador.pt/artigo-2"
+    },
+    "body": "",
+    "pubDate": "2020-08-03T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 2,
+          "name": "Mundo"
+        }
+      ],
+      "authors": [
+        {
+          "id": 402,
+          "name": "Jornalista 2",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 8003,
+    "fullTitle": "sem data",
+    "links": {
+      "webUri": "https://observador.pt/artigo-3"
+    },
+    "body": "Corpo observador 3.",
+    "pubDate": "",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 403,
+          "name": "Jornalista 3",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 8004,
+    "fullTitle": "autor vazio",
+    "links": {
+      "webUri": "https://observador.pt/artigo-4"
+    },
+    "body": "Corpo observador 4.",
+    "pubDate": "2020-08-05T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": [
+        {
+          "id": 1,
+          "name": "",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 8005,
+    "fullTitle": "so foto",
+    "links": {
+      "webUri": "https://observador.pt/artigo-5"
+    },
+    "body": "Corpo observador 5.",
+    "pubDate": "2020-08-06T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 1,
+          "name": "Economia"
+        }
+      ],
+      "authors": [
+        {
+          "id": 2,
+          "name": "Foto",
+          "creditType": [
+            "photo"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 8006,
+    "fullTitle": "tag vazia",
+    "links": {
+      "webUri": "https://observador.pt/artigo-6"
+    },
+    "body": "Corpo observador 6.",
+    "pubDate": "2020-08-07T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 9,
+          "name": ""
+        }
+      ],
+      "authors": [
+        {
+          "id": 406,
+          "name": "Jornalista 6",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 8007,
+    "fullTitle": "com html",
+    "links": {
+      "webUri": "https://observador.pt/artigo-7"
+    },
+    "body": "<p>Olá <b>mundo</b></p>",
+    "pubDate": "2020-08-08T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 3,
+          "name": "Nacional"
+        }
+      ],
+      "authors": [
+        {
+          "id": 407,
+          "name": "Jornalista 7",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 8008,
+    "fullTitle": "sem autores",
+    "links": {
+      "webUri": "https://observador.pt/artigo-8"
+    },
+    "body": "Corpo observador 8.",
+    "pubDate": "2020-08-09T00:00:00Z",
+    "metadata": {
+      "topics": [
+        {
+          "id": 0,
+          "name": "Politica"
+        }
+      ],
+      "authors": []
+    }
+  },
+  {
+    "id": 8009,
+    "fullTitle": "sem tags",
+    "links": {
+      "webUri": "https://observador.pt/artigo-9"
+    },
+    "body": "Corpo observador 9.",
+    "pubDate": "2020-08-10T00:00:00Z",
+    "metadata": {
+      "topics": [],
+      "authors": [
+        {
+          "id": 409,
+          "name": "Jornalista 9",
+          "creditType": [
+            "text"
+          ]
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "authors": [
+      {
+        "name": "Eva Lopes"
+      }
+    ],
+    "date": "2020-08-01T00:00:00.000Z",
+    "newspaper": {
+      "name": "OBSERVADOR"
+    },
+    "tags": [
+      {
+        "name": "Economia"
+      }
+    ],
+    "text": "Corpo da peça.",
+    "title": "Mercados fecham em alta"
+  }
+]

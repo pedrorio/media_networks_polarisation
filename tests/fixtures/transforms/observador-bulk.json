@@ -1,0 +1,15 @@
+[
+  {
+    "title": "Benfica vence o clássico",
+    "date": { "datetime": "2020-09-01T00:00:00.000Z" },
+    "content": "Texto vindo do endpoint bulk.",
+    "categories": [
+      { "name": "Desporto" },
+      { "name": "Cultura" }
+    ],
+    "textCredits": [
+      { "user": { "displayName": "Helena Cruz" } },
+      { "user": { "displayName": "Ivo Ramos" } }
+    ]
+  }
+]
