@@ -79,12 +79,12 @@ The worker article handler SHALL parse the message value as the article JSON obj
 - **AND** parseInt is not how the URL is chosen
 
 ### Requirement: Observador crawl fans out the current id batches
-The worker SHALL ignore the seed value, fetch the Observador widget, and reply with the most recent article JSON under key MOST_RECENT_ARTICLE_DATA. The manager SHALL split that id with getArticleIdBatches using multiple 1000 and SHALL send every batch in one producer call under key FILTER_ARTICLES. The worker SHALL POST each batch to the Observador fetchbulk endpoint and SHALL emit one FILTERED_ARTICLE_DATA message per returned article.
+The worker SHALL ignore the seed value, fetch the Observador widget, and reply with the most recent article JSON under key MOST_RECENT_ARTICLE_DATA. The manager SHALL split that id with getArticleIdBatches using multiple 1000 and SHALL send FILTER_ARTICLES messages under the outstanding-work cap. The worker SHALL POST each received batch to the Observador fetchbulk endpoint and SHALL emit one FILTERED_ARTICLE_DATA message per returned article.
 
 #### Scenario: Widget reply
 - **WHEN** the manager receives MOST_RECENT_ARTICLE_DATA
-- **THEN** it produces one FILTER_ARTICLES message per batch
-- **AND** it does not wait for a batch to finish before sending the rest
+- **THEN** it produces FILTER_ARTICLES messages only up to the outstanding-work cap
+- **AND** it waits for completions before sending the rest
 
 ### Requirement: Id batches cover every id up to the newest
 The manager SHALL enqueue FILTER_ARTICLES batches that together contain every integer from 1 through the most recent Observador id, inclusive, with at most 1000 ids in each batch and no gaps or duplicates.
@@ -169,13 +169,13 @@ Manager and worker code SHALL NOT set a per-message timeout. KafkaJS session and
 - **THEN** no application deadline exists to fire
 - **AND** only the library and the broker can interrupt the member
 
-### Requirement: No bound on outstanding crawl work
-The manager SHALL send the full list of Público RETRIEVE_ARTICLE messages in one producer call and the full list of Observador FILTER_ARTICLES messages in one producer call. It SHALL NOT limit in-flight messages, pause the consumer, or sample the broker backlog.
+### Requirement: Outstanding crawl work is bounded
+The manager SHALL keep outstanding RETRIEVE_ARTICLE and FILTER_ARTICLES messages at or below a configured cap. It SHALL send more only as earlier messages of that kind are completed. It SHALL NOT put an entire crawl into one producer call.
 
 #### Scenario: Large Observador id
-- **WHEN** batch splitting returns many batches
-- **THEN** one send contains every batch
-- **AND** the manager does not wait for workers to drain them
+- **WHEN** batch splitting returns more batches than the cap
+- **THEN** the first send contains at most the cap
+- **AND** further batches are sent only as earlier batches complete
 
 ### Requirement: Observador articles save when the source id is new
 The filtered-article handler and the sequential Observador script SHALL treat an empty title lookup as missing. They SHALL insert when the outlet and source id are not stored, and SHALL NOT insert when that pair is already stored.

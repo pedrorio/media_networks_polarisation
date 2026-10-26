@@ -50,7 +50,7 @@ const run = async () => {
               break;
 
             case messages.PUBLICO.RETRIEVED_ARTICLE_DATA:
-              await publico.retrievedArticleData(message);
+              await publico.retrievedArticleData(message, managerProducer);
               break;
 
             case messages.PUBLICO.RETRIEVED_PAGE_OLDEST_ARTICLE_DATA:
@@ -62,7 +62,7 @@ const run = async () => {
               break;
 
             case messages.OBSERVADOR.FILTERED_ARTICLE_DATA:
-              await observador.filteredArticleData(message);
+              await observador.filteredArticleData(message, managerProducer);
               break;
 
             default:
