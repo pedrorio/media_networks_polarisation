@@ -50,13 +50,13 @@ The worker SHALL parse the message value as a base-10 integer page number, fetch
 - **THEN** pageOldestArticle is omitted
 - **AND** the manager produces no next-page messages
 
-### Requirement: Worker page fetch emits one message per article
-The worker page handler SHALL parse the value as a base-10 integer, fetch that Público list page, and produce one PUBLICO message per returned element with key PAGE_DATA and that element as JSON. It SHALL NOT send the page as one array.
+### Requirement: Worker page fetch emits the page array
+The worker page handler SHALL parse the value as a base-10 integer page number, fetch that Público list page, and produce one PUBLICO message with key PAGE_DATA whose value is the JSON array of articles on that page.
 
 #### Scenario: Page returns three articles
 - **WHEN** the list endpoint returns three article objects
-- **THEN** the worker produces three PAGE_DATA messages
-- **AND** each value is one article object
+- **THEN** the worker produces one PAGE_DATA message
+- **AND** the value is a JSON array of those three objects
 
 ### Requirement: Manager page handler treats the value as an array
 The manager PAGE_DATA handler SHALL parse the value as JSON and map it as an array of articles. For each element whose title is not already stored it SHALL produce RETRIEVE_ARTICLE with that element's JSON as the value.
@@ -66,17 +66,17 @@ The manager PAGE_DATA handler SHALL parse the value as JSON and map it as an arr
 - **THEN** the manager looks up titles and enqueues one RETRIEVE_ARTICLE per title that is not stored
 
 #### Scenario: Value is one article object
-- **WHEN** the value is a single JSON object, which is what the worker page handler sends
+- **WHEN** the value is a single JSON object
 - **THEN** mapping the parsed value as an array throws
 - **AND** no RETRIEVE_ARTICLE message is produced
 
-### Requirement: Worker article fetch parses an integer
-The worker article handler SHALL parse the message value with parseInt and SHALL request the Público article URL derived from that integer.
+### Requirement: Worker article fetch reads the article URL
+The worker article handler SHALL parse the message value as the article JSON object the manager enqueued and SHALL request the Público article URL on that object.
 
 #### Scenario: Value is a JSON article
-- **WHEN** the value is the JSON object the manager enqueues
-- **THEN** parseInt yields NaN
-- **AND** the HTTP request is not built from an article URL
+- **WHEN** the value is the JSON object the manager enqueues, including a url field
+- **THEN** the HTTP request uses that url
+- **AND** parseInt is not how the URL is chosen
 
 ### Requirement: Observador crawl fans out the current id batches
 The worker SHALL ignore the seed value, fetch the Observador widget, and reply with the most recent article JSON under key MOST_RECENT_ARTICLE_DATA. The manager SHALL split that id with getArticleIdBatches using multiple 1000 and SHALL send every batch in one producer call under key FILTER_ARTICLES. The worker SHALL POST each batch to the Observador fetchbulk endpoint and SHALL emit one FILTERED_ARTICLE_DATA message per returned article.

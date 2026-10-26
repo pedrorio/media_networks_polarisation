@@ -24,3 +24,15 @@ The worker article handler SHALL parse the message value as the article JSON obj
 - **WHEN** the value is the JSON object the manager enqueues, including a url field
 - **THEN** the HTTP request uses that url
 - **AND** parseInt is not how the URL is chosen
+
+### Requirement: Manager page handler treats the value as an array
+The manager PAGE_DATA handler SHALL parse the value as JSON and map it as an array of articles. For each element whose title is not already stored it SHALL produce RETRIEVE_ARTICLE with that element's JSON as the value.
+
+#### Scenario: Value is a JSON array
+- **WHEN** the value is a JSON array of article objects
+- **THEN** the manager looks up titles and enqueues one RETRIEVE_ARTICLE per title that is not stored
+
+#### Scenario: Value is one article object
+- **WHEN** the value is a single JSON object
+- **THEN** mapping the parsed value as an array throws
+- **AND** no RETRIEVE_ARTICLE message is produced
