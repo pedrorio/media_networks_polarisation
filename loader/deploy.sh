@@ -1,3 +1,3 @@
 #!/bin/bash
-skaffold build -p ci
-skaffold run -p ci
+skaffold build -p development
+skaffold run -p development

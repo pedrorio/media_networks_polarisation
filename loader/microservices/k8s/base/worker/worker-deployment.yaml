@@ -20,6 +20,18 @@ spec:
               value: kafka-cluster-ip-service
             - name: KAFKA_PORT
               value: '9092'
+            - name: SERVICE
+              value: worker
+            - name: DB_HOST
+              value: postgres-cluster-ip-service
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_USER
+              value: test
+            - name: DB_PASSWORD
+              value: test
+            - name: DB_NAME
+              value: test
           resources:
             requests:
               cpu: 100m
