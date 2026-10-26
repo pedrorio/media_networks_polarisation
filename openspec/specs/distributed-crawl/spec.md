@@ -131,12 +131,12 @@ The application SHALL NOT declare a dead-letter topic, a retry topic, or a poiso
 - **THEN** no dead-letter record is produced
 - **AND** the consumer continues to restart onto that message
 
-### Requirement: No idempotency key
-Produced messages SHALL NOT carry an idempotency key or a deduplication header. A redelivery SHALL run the handler again. Database deduplication that does exist SHALL be a title lookup, not a source article id.
+### Requirement: Article writes are idempotent on source identity
+Each produced article message SHALL carry the outlet and the source article id. A second delivery of the same pair SHALL NOT insert another article row. Title SHALL NOT be the idempotency key.
 
 #### Scenario: Same record delivered twice
-- **WHEN** a committed failure or a killed process causes Kafka to deliver a record again
-- **THEN** the handler runs again with the same key and value
+- **WHEN** the same outlet and source article id are handled twice
+- **THEN** the article table contains one row for that pair
 - **AND** follow-up produces from the first attempt are not recalled
 
 ### Requirement: Kill mid-handler does not roll back side effects
@@ -176,36 +176,45 @@ The manager SHALL send the full list of Público RETRIEVE_ARTICLE messages in on
 - **THEN** one send contains every batch
 - **AND** the manager does not wait for workers to drain them
 
-### Requirement: Observador saves only when the title query is falsy
-The filtered-article handler SHALL load articles by title and SHALL save only when that result is falsy. It SHALL run the same check the sequential Observador script runs. A TypeORM find result is an array, and an array SHALL count as truthy, including when it is empty, so the save SHALL NOT run.
+### Requirement: Observador articles save when the source id is new
+The filtered-article handler and the sequential Observador script SHALL treat an empty title lookup as missing. They SHALL insert when the outlet and source id are not stored, and SHALL NOT insert when that pair is already stored.
 
 #### Scenario: No stored article
-- **WHEN** find by title returns an empty array
-- **THEN** the handler does not save the article
+- **WHEN** the lookup for that Observador source id finds no row
+- **THEN** the handler saves one article
 
 #### Scenario: Title already stored
-- **WHEN** find by title returns a non-empty array
-- **THEN** the handler does not save the article
+- **WHEN** the same Observador source id is already stored
+- **THEN** the handler does not insert a second row
+- **AND** a different source id is not skipped merely because the title string matches
 
-### Requirement: Público title filter runs only before the article fetch
-On a PAGE_DATA value that is an array, the manager SHALL enqueue RETRIEVE_ARTICLE only for titles that are not already stored. The later ARTICLE_DATA save SHALL NOT repeat that check. The Article entity SHALL declare a unique index on title, and the save path SHALL NOT catch a unique violation.
+### Requirement: Público saves are safe to repeat
+The page handler MAY still skip titles already stored. The article save SHALL also be idempotent on outlet plus source id. A unique violation SHALL be treated as the row already existing, not as a crash.
 
 #### Scenario: Duplicate title on the page
-- **WHEN** a page array contains a title that is already stored
-- **THEN** no RETRIEVE_ARTICLE message is produced for that title
+- **WHEN** a page contains a source id that is already stored
+- **THEN** no second article row is created for that source id
 
 #### Scenario: Redelivered article save
-- **WHEN** ARTICLE_DATA is handled twice for a new title
-- **THEN** both attempts call save
-- **AND** a unique-title failure is not handled in application code
+- **WHEN** ARTICLE_DATA is handled twice for one Público source id
+- **THEN** the article table contains one row
+- **AND** the second save does not surface as an unhandled unique violation
 
-### Requirement: Newspaper link is hardcoded to Observador
-The save path SHALL look up a newspaper named OBSERVADOR only. If that row is missing it SHALL save the article object through the newspaper repository. If the row exists it SHALL attach that Observador row to the article, including when the transformed newspaper name is PUBLICO.
+### Requirement: Articles keep the newspaper named by the transform
+The save path SHALL look up the newspaper named on the transformed article. A missing newspaper SHALL be inserted as a newspaper row with that name and then linked. The path SHALL NOT query only OBSERVADOR and SHALL NOT pass the article object to the newspaper repository.
 
 #### Scenario: Observador row missing
-- **WHEN** an article is saved and no OBSERVADOR newspaper row exists
-- **THEN** the article object is passed to the newspaper repository save
+- **WHEN** the article names PUBLICO and no PUBLICO newspaper row exists
+- **THEN** a PUBLICO newspaper row is inserted and linked
+- **AND** the article is not saved through the newspaper repository
 
 #### Scenario: Observador row exists
-- **WHEN** an article of either outlet is saved and an OBSERVADOR row exists
-- **THEN** the article's newspaper is replaced with that row
+- **WHEN** the article names PUBLICO and an OBSERVADOR newspaper row also exists
+- **THEN** the article's newspaper is the PUBLICO row
+
+### Requirement: Saved rows keep transformed fields
+The object passed to the article repository SHALL include the transformed title, text, date, tags, authors, and newspaper name. `excludeExtraneousValues` SHALL NOT drop those fields.
+
+#### Scenario: Público transform round-trip
+- **WHEN** a transformed Público article is converted for save
+- **THEN** title, text, date, tag names, author names, and newspaper name are still set

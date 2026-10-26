@@ -17,6 +17,7 @@ export const transformArticle = (observadorArticleData: ObservadorArticle): Deep
 	
 	return {
 		title: fullTitle,
+		sourceArticleId: observadorArticleData.sourceArticleId ?? observadorArticleData.id,
 		date: new Date(pubDate),
 		tags: topics.map(tag => ({name: tag.name})),
 		text: body,

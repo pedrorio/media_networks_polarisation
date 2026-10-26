@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import { BaseEntity, Column, Entity, Index, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Article } from "../article/article.entity";
 import { IsString } from "class-validator";
@@ -7,6 +8,7 @@ export class Author extends BaseEntity {
     @PrimaryGeneratedColumn()
     id!: number;
   
+    @Expose()
     @Index({ unique: true }) @Column()
     @IsString()
     name!: string;

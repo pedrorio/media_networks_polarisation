@@ -14,6 +14,7 @@ export const transformArticle = (publicoArticleData: PublicoArticle): DeepPartia
   
   return {
     title: titulo,
+    sourceArticleId: publicoArticleData.sourceArticleId ?? publicoArticleData.id,
     date: new Date(data),
     tags: tags.map(tag => ({ name: tag.name })),
     text: texto as string,

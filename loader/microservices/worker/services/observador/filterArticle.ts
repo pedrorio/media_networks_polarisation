@@ -1,4 +1,4 @@
-import { messages, topics } from "../../../../constants";
+import { messages, newspapers, topics } from "../../../../constants";
 import { KafkaMessage, Producer } from "kafkajs";
 import { ObservadorArticleBulk } from "../../../../typings/observador/article.type";
 import { Observador } from "../../../../utils/observador";
@@ -8,6 +8,13 @@ export const filterArticles = async (message: KafkaMessage, workerProducer: Prod
   const filteredArticles = await Observador.getFilteredArticles(batch)
   await workerProducer.send({
     topic: topics.OBSERVADOR,
-    messages: filteredArticles.map((article: ObservadorArticleBulk) => ({ value: JSON.stringify(article), key: messages.OBSERVADOR.FILTERED_ARTICLE_DATA }))
+    messages: filteredArticles.map((article: ObservadorArticleBulk) => ({
+      value: JSON.stringify({
+        ...article,
+        sourceArticleId: article.sourceArticleId ?? article.id,
+        outlet: newspapers.OBSERVADOR,
+      }),
+      key: messages.OBSERVADOR.FILTERED_ARTICLE_DATA,
+    }))
   });
 };
