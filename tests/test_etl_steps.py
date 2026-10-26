@@ -1,8 +1,7 @@
 """Golden tests for the jq wrangle scripts.
 
-Each test runs one script against a checked-in fixture. The clean scripts'
-golden files are empty: sed is redirected onto the file it reads, so the jq
-documents do not survive.
+Each test runs one script against a checked-in fixture. The clean goldens are
+the jq documents after HTML tags are stripped through a temporary file.
 """
 
 from __future__ import annotations
@@ -68,6 +67,42 @@ def _run(script: str, fixture: Path | None, tmp_path: Path) -> Path:
             f"{script} exited {completed.returncode}\n{completed.stdout}\n{completed.stderr}"
         )
     return data
+
+
+def test_fetch_raw_writes_arrays_the_clean_step_reads(tmp_path: Path) -> None:
+    research = tmp_path / "research"
+    project = research / "media_networks_polarisation"
+    (project / "data" / "clean").mkdir(parents=True)
+    env = os.environ.copy()
+    env["RESEARCH"] = str(research)
+    env["LC_ALL"] = "C"
+    completed = subprocess.run(
+        ["sh", str(REPO / "scripts" / "fetch_raw.sh")],
+        cwd=REPO,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        pytest.fail(f"fetch_raw.sh exited {completed.returncode}\n{completed.stderr}")
+    raw = project / "data" / "raw"
+    for name in ("publico.json", "observador.json"):
+        payload = (raw / name).read_text()
+        assert payload.startswith("[")
+    cleaned_run = subprocess.run(
+        ["sh", str(REPO / "scripts" / "wrangle" / "cleanRawData" / "publico.sh")],
+        cwd=REPO,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if cleaned_run.returncode != 0:
+        pytest.fail(cleaned_run.stderr)
+    cleaned = (project / "data" / "clean" / "publico.json").read_text()
+    assert "Olá mundo" in cleaned
+    assert "<b>" not in cleaned
 
 
 def test_clean_publico_matches_golden(tmp_path: Path) -> None:

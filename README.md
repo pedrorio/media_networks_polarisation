@@ -28,7 +28,7 @@ Observador:
 - Bulk fetch: `POST https://observador.pt/wp-json/obs_api/v4/news/fetchbulk`
 - Single item, used by `getArticleData` and not by the Kafka crawl: `https://observador.pt/observador_api/req/3_0/items/id/<id>`
 
-The file ETL reads `$RESEARCH/media_networks_polarisation/data/raw/publico.json` and `observador.json`. No program in this repo writes those files. The Kafka loaders and the sequential `loader/scripts/*.ts` scripts save through TypeORM. They do not fill `data/raw`.
+The file ETL reads `$RESEARCH/media_networks_polarisation/data/raw/publico.json` and `observador.json`. `scripts/fetch_raw.sh` writes those two arrays from the recorded fixtures (or from `--from DIR`). The Kafka loaders and the sequential `loader/scripts/*.ts` scripts still save through TypeORM and do not fill `data/raw`.
 
 ## Architecture
 
@@ -58,7 +58,9 @@ flowchart LR
     RetrieveDag[retrieve_news DAG file]
     EtlDag[etl_news DAG file]
     Scripts[loader/scripts sequential fetch]
-    Raw[data/raw JSON, not written by this repo]
+    Fetch[scripts/fetch_raw.sh]
+    Raw[data/raw JSON]
+    Fetch --> Raw
     Jq[scripts/wrangle jq]
     Tsv[data/integrated TSV]
     RetrieveDag --> Scripts
@@ -105,7 +107,7 @@ Producer calls do not set `acks`, a transactional id, or the idempotent producer
 
 `pipelines/etl_news.py` runs, in order, `cleanRawData/<outlet>.sh`, `createHeaders.sh`, `joinData.sh`, and `integrateData.sh`, with paths under `$RESEARCH/media_networks_polarisation`.
 
-The clean scripts run jq, then `sed ... file > file`. The shell truncates the file before sed reads it, so `data/clean/<outlet>.json` is empty and the HTML strip never sees the jq output. Join and integrate still do what their jq says when they are given clean JSON by hand: join concatenates every JSON value in `data/clean/*.json`, and integrate writes one TSV per relation. Tags and authors are uniqued by name. Newspaper rows are not.
+The clean scripts run jq into a temporary file, then `sed` strips HTML tags into `data/clean/<outlet>.json`. Join concatenates every JSON value in `data/clean/*.json`, and integrate writes one TSV per relation. Tags and authors are uniqued by name. Newspaper rows are not.
 
 ## Failure handling
 
@@ -137,7 +139,6 @@ These are absent. The OpenSpec changes under `openspec/changes/` propose them an
 | A kill mid-handler duplicates side effects, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional | `crash-safe-crawl-cursor` |
 | No backpressure | One `send` for every batch | `bound-crawl-fanout` |
 | Público page and article payloads do not match across the two processes | Worker sends one object per article; manager maps an array. Worker `parseInt`s the article JSON | `align-crawl-payloads` |
-| Clean output is erased, and nothing writes `data/raw` | `sed file > file`. No fetch command | `preserve-cleaned-records` |
 | No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
 | The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |
 
@@ -199,7 +200,7 @@ What the manifests do declare, for the pods that are present:
 
 Tracked paths under `data/` are `.gitkeep` files so the empty directories stay in git. `.gitignore` ignores `data/**` except directories and those `.gitkeep` files. The only commit on this repo never added article files. `.git` is about 248K. `.gitattributes` marks `*.gz` for Git LFS, and there are no LFS objects.
 
-The raw JSON cannot be re-downloaded from a URL in this repo, and no script regenerates a frozen corpus. Re-running the scrapers hits the live sites and still does not write `data/raw`. Because of that, the `.gitkeep` files stay tracked. There is no fetch script and no DVC remote to add: both would pretend a dataset exists.
+There is still no public archive URL. `scripts/fetch_raw.sh` writes `data/raw/publico.json` and `data/raw/observador.json` from the recorded fixtures under `tests/fixtures/etl` (40 articles per outlet), or from a directory passed with `--from`. Set `RESEARCH` to the parent of `media_networks_polarisation` so the path matches the wrangle scripts. Without `RESEARCH` the files land in the repo `data/raw`, which git ignores. The live scrapers still do not write `data/raw`. The `.gitkeep` files stay tracked. There is no DVC remote.
 
 If a corpus is added later, put it in Git LFS (the `*.gz` attribute is already there) or in external storage, and keep it out of ordinary git blobs. This change does not rewrite history. A history rewrite would be a force-push, which is a separate decision, and it is not required to drop data that was never committed.
 
@@ -213,6 +214,7 @@ loader/                  TypeScript loader: entities, transforms, Kafka manager 
   ormconfig.ts           TypeORM Postgres settings
 pipelines/               Airflow DAG files etl_news and retrieve_news
 scripts/wrangle/         jq clean, header, join, and integrate steps
+scripts/fetch_raw.sh     write data/raw from the recorded fixtures
 data/                    empty directory markers only
 openspec/                baseline specs of current behaviour, and change proposals
 tests/                   fixtures, golden files, pytest
