@@ -6,34 +6,35 @@ What the Kubernetes manifests, Skaffold file, Dockerfiles, and database config d
 
 ## Requirements
 
-### Requirement: Manager and worker pods have no probes or resources
-The manager and worker Deployments SHALL set replicas to 1 and the Kafka host and port environment variables. They SHALL NOT set livenessProbe, readinessProbe, resources, or a Postgres environment variable. restartPolicy SHALL stay the Deployment default of Always, which reruns the container command on exit. The manager Service SHALL name port 3000 and the worker Service SHALL name port 5000, and neither container spec SHALL declare a listening port.
+### Requirement: Manager and worker pods expose health and limits
+The manager and worker Deployments SHALL set replicas to 1, the Kafka host and port, a readiness probe, a liveness probe, and CPU and memory requests and limits. They SHALL NOT add a Postgres environment variable in this change. A failing liveness probe SHALL be the signal that restarts the container. The Services MAY keep their current port numbers.
 
 #### Scenario: Manager manifest
 - **WHEN** the manager Deployment is rendered
-- **THEN** it has one replica and KAFKA_HOST kafka-cluster-ip-service
-- **AND** it has no probe and no resource requests or limits
+- **THEN** it has one replica, a readiness probe, a liveness probe, and resource requests and limits
+- **AND** KAFKA_HOST remains kafka-cluster-ip-service
 
 #### Scenario: Container exits
-- **WHEN** the manager or worker process exits
+- **WHEN** the manager liveness probe fails
 - **THEN** the kubelet restarts the container
-- **AND** the process start path runs again, including the manager seed sends
+- **AND** a ready pod is one whose readiness probe is passing
 
 ### Requirement: Kafka and ZooKeeper are single plaintext pods
-The Kafka Deployment SHALL use bitnami/kafka:2.5.0, one replica, container port 9092, and hostPort 9092. It SHALL set ALLOW_PLAINTEXT_LISTENER and SHALL connect to zookeeper-cluster-ip-service:2181. The ZooKeeper Deployment SHALL use bitnami/zookeeper:3.6.1, one replica, hostPort 2181, and ALLOW_ANONYMOUS_LOGIN. Neither manifest SHALL set probes or resource limits. Neither manifest SHALL create the PUBLICO or OBSERVADOR topics.
+The Kafka Deployment SHALL use one replica and plaintext on port 9092, and the ZooKeeper Deployment SHALL use one replica on port 2181. Both SHALL set a readiness probe, a liveness probe, and CPU and memory requests and limits. Neither SHALL set hostPort. Neither SHALL create the PUBLICO or OBSERVADOR topics.
 
 #### Scenario: Broker pod
 - **WHEN** the Kafka pod spec is rendered
-- **THEN** listeners are plaintext
-- **AND** no topic objects are declared
+- **THEN** listeners stay plaintext
+- **AND** hostPort is absent
+- **AND** a readiness probe and resource limits are set
 
-### Requirement: ZooKeeper mounts the broker claim
-The broker PVC and the registry PVC SHALL each request 2Gi ReadWriteOnce. The Kafka pod SHALL mount broker-persistent-volume-claim. The ZooKeeper pod SHALL also set its volume claimName to broker-persistent-volume-claim and SHALL NOT reference registry-persistent-volume-claim.
+### Requirement: Kafka and ZooKeeper use distinct claims
+The broker PVC and the registry PVC SHALL each request 2Gi ReadWriteOnce. The Kafka pod SHALL mount broker-persistent-volume-claim. The ZooKeeper pod SHALL mount registry-persistent-volume-claim and SHALL NOT mount the broker claim.
 
 #### Scenario: Both pods scheduled
 - **WHEN** Kafka and ZooKeeper are both scheduled
-- **THEN** both volume specs name broker-persistent-volume-claim
-- **AND** the registry claim is unused
+- **THEN** their volume claim names differ
+- **AND** the registry claim is the one ZooKeeper uses
 
 ### Requirement: Kustomize base points at missing entity manifests
 The base kustomization SHALL list entity service and deployment files under entities/. Those files SHALL NOT be in the repo, so kustomize build of the base SHALL fail before any pod is applied. The development secrets overlay SHALL reference kafka.env, which SHALL NOT be committed.

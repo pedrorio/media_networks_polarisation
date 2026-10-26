@@ -21,7 +21,23 @@ spec:
           image: bitnami/kafka:2.5.0
           ports:
             - containerPort: 9092
-              hostPort: 9092
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
           volumeMounts:
             - name: kafka-storage
               mountPath: /bitnami/kafka

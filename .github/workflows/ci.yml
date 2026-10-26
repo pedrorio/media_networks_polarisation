@@ -21,8 +21,13 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
+      - name: Install kustomize
+        run: |
+          curl -fsSL -o /tmp/kustomize.tgz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz
+          sudo tar -C /usr/local/bin -xzf /tmp/kustomize.tgz
+
       - name: Install Python tools
-        run: python -m pip install pytest ruff
+        run: python -m pip install pytest ruff pyyaml
 
       - name: Install loader dependencies
         working-directory: loader
