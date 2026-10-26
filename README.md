@@ -114,7 +114,7 @@ The clean scripts run jq into a temporary file, then `sed` strips HTML tags into
 
 Offsets: the application does not set `autoCommit`, `autoCommitInterval`, or `autoCommitThreshold`. In kafkajs 1.12, `commitOffsetsIfNecessary` then does nothing, and the fetch loop commits resolved offsets after the batch. An offset is resolved only after the handler returns.
 
-If the handler throws, earlier offsets in that fetch are committed, the failed offset is not, and the consumer retries the fetch up to the library default of 10 times. When those retries are exhausted the crash path restarts the consumer, because the error is `KafkaJSNumberOfRetriesExceeded`, and the same message is read again. There is no dead-letter topic and no application cap on those restarts. A poison message stalls that partition.
+If the handler throws, that message is tried 5 times. The offset stays uncommitted while those attempts run. When the fifth attempt still throws, the consumer appends one record to `CRAWL_DEAD_LETTER` with the original topic, key, value, and error text, then returns so the offset can commit and the partition moves on. It does not restart onto that message. If the dead-letter produce fails, the error propagates and the offset stays uncommitted. A key this process does not own is ignored and is not dead-lettered. Offsets for messages that already succeeded in the same fetch are committed when the fetch finishes.
 
 If the process is killed inside a handler, the uncommitted message is delivered again after the group session ends. HTTP calls and follow-up produces already done are not rolled back. There is no transaction across Kafka and Postgres. Article messages carry the outlet and the source article id, so the save of that pair does not insert a second row. The Kafka producer itself is still not idempotent, and a replay does not recall the follow-up produces from the first attempt.
 
@@ -132,8 +132,6 @@ Open changes under `openspec/changes/` are not implemented. Archived changes are
 
 | Gap | Where it shows up | Proposal |
 | --- | --- | --- |
-| No application retry budget, and a failing message is retried forever by consumer restart | KafkaJS default of 10 fetch retries, then restart onto the same offset | `retry-failed-messages` |
-| No dead-letter or poison-message handling | No dead-letter topic in code or manifests | `retry-failed-messages` |
 | A kill mid-handler repeats HTTP calls and follow-up produces, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional. The article row itself is not duplicated | `crash-safe-crawl-cursor` |
 | No backpressure | One `send` for every batch | `bound-crawl-fanout` |
 | No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
@@ -227,4 +225,4 @@ tests/                   fixtures, golden files, pytest
 - `article-transform` — the pure field mappings and `range`
 - `cluster-workload` — what the manifests and image build actually declare
 
-`openspec/changes/` holds the proposals in the table above. They are not applied.
+`openspec/changes/` holds the proposals that are not implemented yet. Archived changes are.
