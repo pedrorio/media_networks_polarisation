@@ -8,7 +8,7 @@ This repository collects articles from two Portuguese news outlets, Público and
 
 There is no polarisation score, stance label, graph, or distance between outlets. Two separate ingestion paths store articles:
 
-- The Kafka path maps a fetched article into title, date, text, tag names, author names, and a newspaper name (`PUBLICO` or `OBSERVADOR`), then tries to save that through TypeORM.
+- The Kafka path maps a fetched article into title, date, text, tag names, author names, and a newspaper name (`PUBLICO` or `OBSERVADOR`), then saves that through TypeORM. A second save of the same outlet and source article id does not insert another row.
 - The file path maps raw JSON into title, url, text, date, tags, authors, and a newspaper label (`Público` or `Observador`), then writes TSV files.
 
 Those mappings are not the same schema, and neither path builds a network from them.
@@ -96,9 +96,9 @@ Observador:
 1. The worker ignores the seed value, calls the widget endpoint, and replies with the newest article under `MOST_RECENT_ARTICLE_DATA`.
 2. The manager splits ids from 1 through that newest id, inclusive, into contiguous batches of at most 1000 and sends every batch in one produce, key `FILTER_ARTICLES`. For id 10 and size 4 the batches are `[1, 2, 3, 4]`, `[5, 6, 7, 8]`, and `[9, 10]`.
 3. The worker POSTs each batch to the bulk endpoint and emits one `FILTERED_ARTICLE_DATA` per returned article.
-4. The manager loads rows by title and saves only when that result is falsy. TypeORM `find` returns an array. An array is truthy even when empty, so this save does not run.
+4. The worker's filtered-article message carries `outlet` and `sourceArticleId`. The manager saves when that pair is not already stored. An empty lookup inserts one row. A second delivery does not. The same title with a different source id is a different article. The newspaper row is the one named on the transform (`PUBLICO` or `OBSERVADOR`). Title, text, date, tags, authors, and that newspaper name are still set on the object passed to the article repository.
 
-`ArticleDTO.toArticle` uses `excludeExtraneousValues: true`. The entity fields are not `@Expose`d, so those properties are dropped before a save. `addUniqueNewspaper` looks up the newspaper named `OBSERVADOR` only. If that row exists, every article, including Público, is pointed at it. If it does not, the article object is passed to the newspaper repository.
+Público article messages carry the same identity. The page handler may still skip titles already stored before the fetch. The article save is also idempotent on outlet plus source id, and a unique violation is treated as the row already existing.
 
 Producer calls do not set `acks`, a transactional id, or the idempotent producer. kafkajs 1.12 then uses `acks: -1` and `idempotent: false`.
 
@@ -116,7 +116,7 @@ Offsets: the application does not set `autoCommit`, `autoCommitInterval`, or `au
 
 If the handler throws, earlier offsets in that fetch are committed, the failed offset is not, and the consumer retries the fetch up to the library default of 10 times. When those retries are exhausted the crash path restarts the consumer, because the error is `KafkaJSNumberOfRetriesExceeded`, and the same message is read again. There is no dead-letter topic and no application cap on those restarts. A poison message stalls that partition.
 
-If the process is killed inside a handler, the uncommitted message is delivered again after the group session ends. HTTP calls, follow-up produces, and database writes already done are not rolled back. There is no transaction across Kafka and Postgres, and produced messages have no idempotency key.
+If the process is killed inside a handler, the uncommitted message is delivered again after the group session ends. HTTP calls and follow-up produces already done are not rolled back. There is no transaction across Kafka and Postgres. Article messages carry the outlet and the source article id, so the save of that pair does not insert a second row. The Kafka producer itself is still not idempotent, and a replay does not recall the follow-up produces from the first attempt.
 
 Starting the manager again always appends a new page-1 seed and a new Observador seed, including when `manager-group` already has offsets. The Deployment restart policy is the default `Always`, so a container exit runs that startup path again. There is no crawl cursor.
 
@@ -134,10 +134,7 @@ Open changes under `openspec/changes/` are not implemented. Archived changes are
 | --- | --- | --- |
 | No application retry budget, and a failing message is retried forever by consumer restart | KafkaJS default of 10 fetch retries, then restart onto the same offset | `retry-failed-messages` |
 | No dead-letter or poison-message handling | No dead-letter topic in code or manifests | `retry-failed-messages` |
-| No idempotency key. Redelivery runs the handler again | Produces set no key for dedup. Title is the only lookup | `idempotent-article-writes` |
-| Observador rows are not saved | `if (!existingArticles)` is false for every array `find` returns | `idempotent-article-writes` |
-| Newspaper is forced to Observador, and transformed fields are dropped on save | `addUniqueNewspaper`, `ArticleDTO.toArticle` | `idempotent-article-writes` |
-| A kill mid-handler duplicates side effects, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional | `crash-safe-crawl-cursor` |
+| A kill mid-handler repeats HTTP calls and follow-up produces, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional. The article row itself is not duplicated | `crash-safe-crawl-cursor` |
 | No backpressure | One `send` for every batch | `bound-crawl-fanout` |
 | No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
 | The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |

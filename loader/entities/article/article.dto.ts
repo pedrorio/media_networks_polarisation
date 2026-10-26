@@ -19,6 +19,8 @@ export class ArticleDTO {
   
   @IsString()
   title!: string;
+
+  sourceArticleId?: number;
   
   @IsUrl()
   url!: string;
