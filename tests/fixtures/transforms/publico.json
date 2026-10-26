@@ -1,0 +1,27 @@
+[
+  {
+    "titulo": "Governo apresenta orçamento",
+    "data": "2020-07-01",
+    "texto": "O texto principal fica.",
+    "tags": [
+      { "nome": "Politica", "name": "Politica" }
+    ],
+    "autores": [
+      { "nome": "Ana Silva", "contribuicao": "Texto" },
+      { "nome": "Bruno Costa", "contribuicao": "Fotografia" }
+    ]
+  },
+  {
+    "titulo": "Créditos em minúsculas",
+    "data": "2020-07-02",
+    "texto": "Segundo corpo.",
+    "tags": [
+      { "nome": "SoNome" }
+    ],
+    "autores": [
+      { "nome": "Carla Dias", "contribuicao": "textos" },
+      { "nome": "Duarte Melo", "contribuicao": "Textos" },
+      { "nome": "Eva Nunes", "contribuicao": "texto" }
+    ]
+  }
+]

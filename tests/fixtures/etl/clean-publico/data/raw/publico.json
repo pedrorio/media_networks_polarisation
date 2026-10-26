@@ -1,0 +1,943 @@
+[
+  {
+    "id": 1000,
+    "url": "/2020/07/01/artigo-0",
+    "titulo": "Artigo publico 0",
+    "texto": "Corpo do artigo 0.",
+    "data": "2020-07-01",
+    "tags": [
+      {
+        "id": 10,
+        "nome": "Politica"
+      },
+      {
+        "id": 50,
+        "nome": "Tema 0"
+      }
+    ],
+    "autores": [
+      {
+        "id": 200,
+        "nome": "Autor 0",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1001,
+    "url": "/2020/07/02/artigo-1",
+    "titulo": "Artigo publico 1",
+    "texto": "Corpo do artigo 1.",
+    "data": "2020-07-02",
+    "tags": [
+      {
+        "id": 11,
+        "nome": "Economia"
+      },
+      {
+        "id": 51,
+        "nome": "Tema 1"
+      }
+    ],
+    "autores": [
+      {
+        "id": 201,
+        "nome": "Autor 1",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1002,
+    "url": "/2020/07/03/artigo-2",
+    "titulo": "Artigo publico 2",
+    "texto": "Corpo do artigo 2.",
+    "data": "2020-07-03",
+    "tags": [
+      {
+        "id": 12,
+        "nome": "Cultura"
+      },
+      {
+        "id": 52,
+        "nome": "Tema 2"
+      }
+    ],
+    "autores": [
+      {
+        "id": 202,
+        "nome": "Autor 2",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1003,
+    "url": "/2020/07/04/artigo-3",
+    "titulo": "Artigo publico 3",
+    "texto": "Corpo do artigo 3.",
+    "data": "2020-07-04",
+    "tags": [
+      {
+        "id": 13,
+        "nome": "Desporto"
+      },
+      {
+        "id": 53,
+        "nome": "Tema 3"
+      }
+    ],
+    "autores": [
+      {
+        "id": 203,
+        "nome": "Autor 3",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1004,
+    "url": "/2020/07/05/artigo-4",
+    "titulo": "Artigo publico 4",
+    "texto": "Corpo do artigo 4.",
+    "data": "2020-07-05",
+    "tags": [
+      {
+        "id": 14,
+        "nome": "Sociedade"
+      },
+      {
+        "id": 54,
+        "nome": "Tema 4"
+      }
+    ],
+    "autores": [
+      {
+        "id": 204,
+        "nome": "Autor 4",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1005,
+    "url": "/2020/07/06/artigo-5",
+    "titulo": "Artigo publico 5",
+    "texto": "Corpo do artigo 5.",
+    "data": "2020-07-06",
+    "tags": [
+      {
+        "id": 10,
+        "nome": "Politica"
+      },
+      {
+        "id": 55,
+        "nome": "Tema 5"
+      }
+    ],
+    "autores": [
+      {
+        "id": 205,
+        "nome": "Autor 5",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1006,
+    "url": "/2020/07/07/artigo-6",
+    "titulo": "Artigo publico 6",
+    "texto": "Corpo do artigo 6.",
+    "data": "2020-07-07",
+    "tags": [
+      {
+        "id": 11,
+        "nome": "Economia"
+      },
+      {
+        "id": 56,
+        "nome": "Tema 6"
+      }
+    ],
+    "autores": [
+      {
+        "id": 206,
+        "nome": "Autor 6",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1007,
+    "url": "/2020/07/08/artigo-7",
+    "titulo": "Artigo publico 7",
+    "texto": "Corpo do artigo 7.",
+    "data": "2020-07-08",
+    "tags": [
+      {
+        "id": 12,
+        "nome": "Cultura"
+      },
+      {
+        "id": 57,
+        "nome": "Tema 7"
+      }
+    ],
+    "autores": [
+      {
+        "id": 207,
+        "nome": "Autor 7",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1008,
+    "url": "/2020/07/09/artigo-8",
+    "titulo": "Artigo publico 8",
+    "texto": "Corpo do artigo 8.",
+    "data": "2020-07-09",
+    "tags": [
+      {
+        "id": 13,
+        "nome": "Desporto"
+      },
+      {
+        "id": 58,
+        "nome": "Tema 8"
+      }
+    ],
+    "autores": [
+      {
+        "id": 208,
+        "nome": "Autor 8",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1009,
+    "url": "/2020/07/10/artigo-9",
+    "titulo": "Artigo publico 9",
+    "texto": "Corpo do artigo 9.",
+    "data": "2020-07-10",
+    "tags": [
+      {
+        "id": 14,
+        "nome": "Sociedade"
+      },
+      {
+        "id": 59,
+        "nome": "Tema 9"
+      }
+    ],
+    "autores": [
+      {
+        "id": 209,
+        "nome": "Autor 9",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1010,
+    "url": "/2020/07/11/artigo-10",
+    "titulo": "Artigo publico 10",
+    "texto": "Corpo do artigo 10.",
+    "data": "2020-07-11",
+    "tags": [
+      {
+        "id": 10,
+        "nome": "Politica"
+      },
+      {
+        "id": 60,
+        "nome": "Tema 10"
+      }
+    ],
+    "autores": [
+      {
+        "id": 210,
+        "nome": "Autor 10",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1011,
+    "url": "/2020/07/12/artigo-11",
+    "titulo": "Artigo publico 11",
+    "texto": "Corpo do artigo 11.",
+    "data": "2020-07-12",
+    "tags": [
+      {
+        "id": 11,
+        "nome": "Economia"
+      },
+      {
+        "id": 61,
+        "nome": "Tema 11"
+      }
+    ],
+    "autores": [
+      {
+        "id": 211,
+        "nome": "Autor 11",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1012,
+    "url": "/2020/07/13/artigo-12",
+    "titulo": "Artigo publico 12",
+    "texto": "Corpo do artigo 12.",
+    "data": "2020-07-13",
+    "tags": [
+      {
+        "id": 12,
+        "nome": "Cultura"
+      },
+      {
+        "id": 62,
+        "nome": "Tema 12"
+      }
+    ],
+    "autores": [
+      {
+        "id": 212,
+        "nome": "Autor 12",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1013,
+    "url": "/2020/07/14/artigo-13",
+    "titulo": "Artigo publico 13",
+    "texto": "Corpo do artigo 13.",
+    "data": "2020-07-14",
+    "tags": [
+      {
+        "id": 13,
+        "nome": "Desporto"
+      },
+      {
+        "id": 63,
+        "nome": "Tema 13"
+      }
+    ],
+    "autores": [
+      {
+        "id": 213,
+        "nome": "Autor 13",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1014,
+    "url": "/2020/07/15/artigo-14",
+    "titulo": "Artigo publico 14",
+    "texto": "Corpo do artigo 14.",
+    "data": "2020-07-15",
+    "tags": [
+      {
+        "id": 14,
+        "nome": "Sociedade"
+      },
+      {
+        "id": 64,
+        "nome": "Tema 14"
+      }
+    ],
+    "autores": [
+      {
+        "id": 214,
+        "nome": "Autor 14",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1015,
+    "url": "/2020/07/16/artigo-15",
+    "titulo": "Artigo publico 15",
+    "texto": "Corpo do artigo 15.",
+    "data": "2020-07-16",
+    "tags": [
+      {
+        "id": 10,
+        "nome": "Politica"
+      },
+      {
+        "id": 65,
+        "nome": "Tema 15"
+      }
+    ],
+    "autores": [
+      {
+        "id": 215,
+        "nome": "Autor 15",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1016,
+    "url": "/2020/07/17/artigo-16",
+    "titulo": "Artigo publico 16",
+    "texto": "Corpo do artigo 16.",
+    "data": "2020-07-17",
+    "tags": [
+      {
+        "id": 11,
+        "nome": "Economia"
+      },
+      {
+        "id": 66,
+        "nome": "Tema 16"
+      }
+    ],
+    "autores": [
+      {
+        "id": 216,
+        "nome": "Autor 16",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1017,
+    "url": "/2020/07/18/artigo-17",
+    "titulo": "Artigo publico 17",
+    "texto": "Corpo do artigo 17.",
+    "data": "2020-07-18",
+    "tags": [
+      {
+        "id": 12,
+        "nome": "Cultura"
+      },
+      {
+        "id": 67,
+        "nome": "Tema 17"
+      }
+    ],
+    "autores": [
+      {
+        "id": 217,
+        "nome": "Autor 17",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1018,
+    "url": "/2020/07/19/artigo-18",
+    "titulo": "Artigo publico 18",
+    "texto": "Corpo do artigo 18.",
+    "data": "2020-07-19",
+    "tags": [
+      {
+        "id": 13,
+        "nome": "Desporto"
+      },
+      {
+        "id": 68,
+        "nome": "Tema 18"
+      }
+    ],
+    "autores": [
+      {
+        "id": 218,
+        "nome": "Autor 18",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1019,
+    "url": "/2020/07/20/artigo-19",
+    "titulo": "Artigo publico 19",
+    "texto": "Corpo do artigo 19.",
+    "data": "2020-07-20",
+    "tags": [
+      {
+        "id": 14,
+        "nome": "Sociedade"
+      },
+      {
+        "id": 69,
+        "nome": "Tema 19"
+      }
+    ],
+    "autores": [
+      {
+        "id": 219,
+        "nome": "Autor 19",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1020,
+    "url": "/2020/07/21/artigo-20",
+    "titulo": "Artigo publico 20",
+    "texto": "Corpo do artigo 20.",
+    "data": "2020-07-21",
+    "tags": [
+      {
+        "id": 10,
+        "nome": "Politica"
+      },
+      {
+        "id": 70,
+        "nome": "Tema 20"
+      }
+    ],
+    "autores": [
+      {
+        "id": 220,
+        "nome": "Autor 20",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1021,
+    "url": "/2020/07/22/artigo-21",
+    "titulo": "Artigo publico 21",
+    "texto": "Corpo do artigo 21.",
+    "data": "2020-07-22",
+    "tags": [
+      {
+        "id": 11,
+        "nome": "Economia"
+      },
+      {
+        "id": 71,
+        "nome": "Tema 21"
+      }
+    ],
+    "autores": [
+      {
+        "id": 221,
+        "nome": "Autor 21",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1022,
+    "url": "/2020/07/23/artigo-22",
+    "titulo": "Artigo publico 22",
+    "texto": "Corpo do artigo 22.",
+    "data": "2020-07-23",
+    "tags": [
+      {
+        "id": 12,
+        "nome": "Cultura"
+      },
+      {
+        "id": 72,
+        "nome": "Tema 22"
+      }
+    ],
+    "autores": [
+      {
+        "id": 222,
+        "nome": "Autor 22",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1023,
+    "url": "/2020/07/24/artigo-23",
+    "titulo": "Artigo publico 23",
+    "texto": "Corpo do artigo 23.",
+    "data": "2020-07-24",
+    "tags": [
+      {
+        "id": 13,
+        "nome": "Desporto"
+      },
+      {
+        "id": 73,
+        "nome": "Tema 23"
+      }
+    ],
+    "autores": [
+      {
+        "id": 223,
+        "nome": "Autor 23",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1024,
+    "url": "/2020/07/25/artigo-24",
+    "titulo": "Artigo publico 24",
+    "texto": "Corpo do artigo 24.",
+    "data": "2020-07-25",
+    "tags": [
+      {
+        "id": 14,
+        "nome": "Sociedade"
+      },
+      {
+        "id": 74,
+        "nome": "Tema 24"
+      }
+    ],
+    "autores": [
+      {
+        "id": 224,
+        "nome": "Autor 24",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1025,
+    "url": "/2020/07/26/artigo-25",
+    "titulo": "Artigo publico 25",
+    "texto": "Corpo do artigo 25.",
+    "data": "2020-07-26",
+    "tags": [
+      {
+        "id": 10,
+        "nome": "Politica"
+      },
+      {
+        "id": 75,
+        "nome": "Tema 25"
+      }
+    ],
+    "autores": [
+      {
+        "id": 225,
+        "nome": "Autor 25",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1026,
+    "url": "/2020/07/27/artigo-26",
+    "titulo": "Artigo publico 26",
+    "texto": "Corpo do artigo 26.",
+    "data": "2020-07-27",
+    "tags": [
+      {
+        "id": 11,
+        "nome": "Economia"
+      },
+      {
+        "id": 76,
+        "nome": "Tema 26"
+      }
+    ],
+    "autores": [
+      {
+        "id": 226,
+        "nome": "Autor 26",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1027,
+    "url": "/2020/07/28/artigo-27",
+    "titulo": "Artigo publico 27",
+    "texto": "Corpo do artigo 27.",
+    "data": "2020-07-28",
+    "tags": [
+      {
+        "id": 12,
+        "nome": "Cultura"
+      },
+      {
+        "id": 77,
+        "nome": "Tema 27"
+      }
+    ],
+    "autores": [
+      {
+        "id": 227,
+        "nome": "Autor 27",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1028,
+    "url": "/2020/07/29/artigo-28",
+    "titulo": "Artigo publico 28",
+    "texto": "Corpo do artigo 28.",
+    "data": "2020-07-01",
+    "tags": [
+      {
+        "id": 13,
+        "nome": "Desporto"
+      },
+      {
+        "id": 78,
+        "nome": "Tema 28"
+      }
+    ],
+    "autores": [
+      {
+        "id": 228,
+        "nome": "Autor 28",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 1029,
+    "url": "/2020/07/30/artigo-29",
+    "titulo": "Artigo publico 29",
+    "texto": "Corpo do artigo 29.",
+    "data": "2020-07-02",
+    "tags": [
+      {
+        "id": 14,
+        "nome": "Sociedade"
+      },
+      {
+        "id": 79,
+        "nome": "Tema 29"
+      }
+    ],
+    "autores": [
+      {
+        "id": 229,
+        "nome": "Autor 29",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 1000,
+    "url": "/2020/07/01/artigo-0",
+    "titulo": "duplicado de id",
+    "texto": "Corpo do artigo 0.",
+    "data": "2020-07-01",
+    "tags": [
+      {
+        "id": 10,
+        "nome": "Politica"
+      },
+      {
+        "id": 50,
+        "nome": "Tema 0"
+      }
+    ],
+    "autores": [
+      {
+        "id": 200,
+        "nome": "Autor 0",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 9001,
+    "url": "/2020/07/02/artigo-1",
+    "titulo": "Artigo publico 1",
+    "texto": "Corpo do artigo 1.",
+    "data": "2020-07-02",
+    "tags": [
+      {
+        "id": 11,
+        "nome": "Economia"
+      },
+      {
+        "id": 51,
+        "nome": "Tema 1"
+      }
+    ],
+    "autores": [
+      {
+        "id": 201,
+        "nome": "Autor 1",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 9002,
+    "url": "/2020/07/03/artigo-2",
+    "titulo": "sem texto",
+    "texto": "",
+    "data": "2020-07-03",
+    "tags": [
+      {
+        "id": 12,
+        "nome": "Cultura"
+      },
+      {
+        "id": 52,
+        "nome": "Tema 2"
+      }
+    ],
+    "autores": [
+      {
+        "id": 202,
+        "nome": "Autor 2",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 9003,
+    "url": "/2020/07/04/artigo-3",
+    "titulo": "sem data",
+    "texto": "Corpo do artigo 3.",
+    "data": "",
+    "tags": [
+      {
+        "id": 13,
+        "nome": "Desporto"
+      },
+      {
+        "id": 53,
+        "nome": "Tema 3"
+      }
+    ],
+    "autores": [
+      {
+        "id": 203,
+        "nome": "Autor 3",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 9004,
+    "url": "/2020/07/05/artigo-4",
+    "titulo": "autor vazio",
+    "texto": "Corpo do artigo 4.",
+    "data": "2020-07-05",
+    "tags": [
+      {
+        "id": 14,
+        "nome": "Sociedade"
+      },
+      {
+        "id": 54,
+        "nome": "Tema 4"
+      }
+    ],
+    "autores": [
+      {
+        "id": 1,
+        "nome": "",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 9005,
+    "url": "/2020/07/06/artigo-5",
+    "titulo": "so fotografia",
+    "texto": "Corpo do artigo 5.",
+    "data": "2020-07-06",
+    "tags": [
+      {
+        "id": 10,
+        "nome": "Politica"
+      },
+      {
+        "id": 55,
+        "nome": "Tema 5"
+      }
+    ],
+    "autores": [
+      {
+        "id": 2,
+        "nome": "Foto",
+        "contribuicao": "Fotografia"
+      }
+    ]
+  },
+  {
+    "id": 9006,
+    "url": "/2020/07/07/artigo-6",
+    "titulo": "tag vazia",
+    "texto": "Corpo do artigo 6.",
+    "data": "2020-07-07",
+    "tags": [
+      {
+        "id": 3,
+        "nome": ""
+      }
+    ],
+    "autores": [
+      {
+        "id": 206,
+        "nome": "Autor 6",
+        "contribuicao": "Texto"
+      }
+    ]
+  },
+  {
+    "id": 9007,
+    "url": "/2020/07/08/artigo-7",
+    "titulo": "com html",
+    "texto": "<p>Olá <b>mundo</b></p>",
+    "data": "2020-07-08",
+    "tags": [
+      {
+        "id": 12,
+        "nome": "Cultura"
+      },
+      {
+        "id": 57,
+        "nome": "Tema 7"
+      }
+    ],
+    "autores": [
+      {
+        "id": 207,
+        "nome": "Autor 7",
+        "contribuicao": "textos"
+      }
+    ]
+  },
+  {
+    "id": 9008,
+    "url": "/2020/07/09/artigo-8",
+    "titulo": "sem autores",
+    "texto": "Corpo do artigo 8.",
+    "data": "2020-07-09",
+    "tags": [
+      {
+        "id": 13,
+        "nome": "Desporto"
+      },
+      {
+        "id": 58,
+        "nome": "Tema 8"
+      }
+    ],
+    "autores": []
+  },
+  {
+    "id": 9010,
+    "url": "/2020/07/10/artigo-9",
+    "titulo": "sem tags",
+    "texto": "Corpo do artigo 9.",
+    "data": "2020-07-10",
+    "tags": [],
+    "autores": [
+      {
+        "id": 209,
+        "nome": "Autor 9",
+        "contribuicao": "textos"
+      }
+    ]
+  }
+]

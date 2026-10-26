@@ -1,0 +1,28 @@
+schema: spec-driven
+
+# Constraints an agent cannot safely guess from a quick read of the tree.
+context: |
+  This repository is Pedro Rio's showcase of a distributed news-collection
+  pipeline for the Portuguese outlets Público and Observador. Specs describe
+  the code as it behaves today, including defects. Do not invent retries,
+  idempotency, dead-lettering, backpressure, health checks, or a polarisation
+  metric. Nothing in the repo defines or computes polarisation.
+  Two ingestion paths are checked in and are not connected. A Kafka manager
+  and worker (kafkajs 1.12) share topics PUBLICO and OBSERVADOR. A separate
+  pair of Airflow DAG files shells out to sequential TypeScript scripts and
+  to jq scripts under $RESEARCH/media_networks_polarisation. Airflow is not
+  deployed; the airflow directory is gitignored. data/ tracks only .gitkeep
+  files. Change proposals specify repairs and are not implemented by writing
+  the proposal. Do not rewrite git history.
+
+rules:
+  proposal:
+    - State the current defect in Why, and the replacement behaviour in What Changes.
+    - Do not mark a proposal implemented. Tasks stay unchecked.
+  specs:
+    - Baseline requirements use SHALL for behaviour the code has today.
+    - Keep each requirement body under 500 characters. Put examples in scenarios.
+    - One behaviour per requirement.
+  tasks:
+    - Every task is an unchecked checkbox with a verification step.
+    - Do not check a task off from authoring the proposal.

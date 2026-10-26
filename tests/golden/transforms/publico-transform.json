@@ -1,0 +1,42 @@
+[
+  {
+    "authors": [
+      {
+        "name": "Ana Silva"
+      }
+    ],
+    "date": "2020-07-01T00:00:00.000Z",
+    "newspaper": {
+      "name": "PUBLICO"
+    },
+    "tags": [
+      {
+        "name": "Politica"
+      }
+    ],
+    "text": "O texto principal fica.",
+    "title": "Governo apresenta orçamento"
+  },
+  {
+    "authors": [
+      {
+        "name": "Carla Dias"
+      },
+      {
+        "name": "Duarte Melo"
+      },
+      {
+        "name": "Eva Nunes"
+      }
+    ],
+    "date": "2020-07-02T00:00:00.000Z",
+    "newspaper": {
+      "name": "PUBLICO"
+    },
+    "tags": [
+      {}
+    ],
+    "text": "Segundo corpo.",
+    "title": "Créditos em minúsculas"
+  }
+]

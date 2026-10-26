@@ -1,0 +1,17 @@
+[
+  {
+    "fullTitle": "Mercados fecham em alta",
+    "pubDate": "2020-08-01T00:00:00.000Z",
+    "body": "Corpo da peça.",
+    "metadata": {
+      "topics": [
+        { "name": "Economia" }
+      ],
+      "authors": [
+        { "name": "Eva Lopes", "creditType": ["text"] },
+        { "name": "Filipe Rocha", "creditType": ["photo"] },
+        { "name": "Gil Pires", "creditType": ["textbook"] }
+      ]
+    }
+  }
+]
