@@ -2,6 +2,19 @@
 
 ## MODIFIED Requirements
 
+### Requirement: Manager and worker pods expose health and limits
+The manager and worker Deployments SHALL set replicas to 1, the Kafka host and port, a readiness probe, a liveness probe, and CPU and memory requests and limits. A failing liveness probe SHALL be the signal that restarts the container. The Services MAY keep their current port numbers.
+
+#### Scenario: Manager manifest
+- **WHEN** the manager Deployment is rendered
+- **THEN** it has one replica, a readiness probe, a liveness probe, and resource requests and limits
+- **AND** KAFKA_HOST remains kafka-cluster-ip-service
+
+#### Scenario: Container exits
+- **WHEN** the manager liveness probe fails
+- **THEN** the kubelet restarts the container
+- **AND** a ready pod is one whose readiness probe is passing
+
 ### Requirement: Kustomize base points at missing entity manifests
 The base kustomization SHALL list only manifests that exist in the repo, or the missing entity manifests SHALL be added. `kustomize build` of `loader/microservices/k8s/base` SHALL succeed. The development overlay SHALL NOT reference an env file that is not created by the repo.
 

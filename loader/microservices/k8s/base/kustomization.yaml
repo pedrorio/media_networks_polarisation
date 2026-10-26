@@ -15,5 +15,4 @@ resources:
   - worker/worker-cluster-ip-service.yaml
   - worker/worker-deployment.yaml
 
-  - entities/entities-cluster-ip-service.yaml
-  - entities/entities-deployment.yaml
+  - postgres/postgres.yaml

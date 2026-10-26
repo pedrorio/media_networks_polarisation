@@ -1,6 +1,6 @@
 FROM node:14.5-alpine
-WORKDIR '/app'
-COPY package.json yarn.lock ./
-RUN yarn
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY ./ ./
-CMD ["yarn", "start"]
+CMD ["npm", "start"]

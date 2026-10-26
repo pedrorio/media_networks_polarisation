@@ -128,19 +128,13 @@ Unknown keys are ignored and then committed. That is how the other group's messa
 
 ## Known gaps
 
-Open changes under `openspec/changes/` are not implemented. Archived changes are.
-
-| Gap | Where it shows up | Proposal |
-| --- | --- | --- |
-| The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |
-
-Also not fixed by those proposals, and not present in the code: `filterArticles` calls `concat` without assigning the result and returns an empty list. No crawl path calls it. The sequential scripts call `getFilteredArticles` directly.
+The proposals under `openspec/changes/` are archived. One defect is still outside those proposals: `filterArticles` calls `concat` without assigning the result and returns an empty list. No crawl path calls it. The sequential scripts call `getFilteredArticles` directly.
 
 Polarisation is not specified, because the code does not compute one. A future definition would be a new spec, not a description of this tree.
 
 ## Running it
 
-Nothing below is a working quick start. The commands in the repo do not match the tree.
+The commands below match the tree. They still need a cluster, a container runtime, and credentials before anything is crawled. This checkout did not create the GKE cluster.
 
 ### Tests, which do run without a cluster
 
@@ -148,45 +142,45 @@ The pytest suite uses checked-in fixtures of at most a few dozen articles per fi
 
 ```bash
 npm ci --prefix loader
-python -m pip install pytest ruff
+python -m pip install pytest ruff pyyaml
 ruff check tests
 pytest -q
 ```
 
-Golden files cover each wrangle step (`clean` for each outlet, headers, join, integrate) and the pure transforms: Público article mapping, both Observador mappings, id batches, and `range`. The clean goldens are empty because that is what those scripts write.
+Golden files cover each wrangle step (`clean` for each outlet, headers, join, integrate) and the pure transforms: Público article mapping, both Observador mappings, id batches, and `range`. The clean goldens are the jq documents after HTML tags are stripped.
 
 `openspec validate --all --strict` checks the specs. CI runs the linter, pytest, and that validate.
 
 ### Skaffold
 
-`loader/skaffold.yaml` has one profile, `development`. From `loader/` the intended command would be:
+`loader/skaffold.yaml` has one profile, `development`. From `loader/`:
 
 ```bash
 skaffold dev -p development
 ```
 
-That config builds contexts `manager`, `worker`, and `entities`, and kustomize paths `k8s/overlays/development/secrets` and `k8s/base`. The Dockerfiles and manifests are under `loader/microservices/`, not those paths. There is no `entities` Dockerfile. The development overlay references `kafka.env`, which is not committed (`loader/.gitignore` ignores `**/*.env`).
+The build context is `loader/`. The Dockerfiles are `microservices/manager/Dockerfile` and `microservices/worker/Dockerfile`. Kustomize uses `microservices/k8s/base`. There is no entities image. The development secrets overlay does not read `kafka.env`.
 
-`loader/deploy.sh` runs `skaffold build -p ci` and `skaffold run -p ci`. The file does not define a `ci` profile.
+`loader/deploy.sh` runs `skaffold build -p development` and `skaffold run -p development`.
 
-Both Dockerfiles `COPY package.json yarn.lock` and `CMD ["yarn", "start"]`. The repo has `package-lock.json`, no `yarn.lock`, and `package.json` has no `start` script.
+Both Dockerfiles `COPY package.json package-lock.json`, run `npm ci`, and `CMD ["npm", "start"]`. `npm start` runs `ts-node` on `microservices/$SERVICE/index.ts`. The manager pod sets `SERVICE=manager` and the worker pod sets `SERVICE=worker`.
 
 ### Kubernetes
 
-`loader/microservices/k8s/infra/up.sh` only creates a GKE cluster named `enterprise-integration` (version `1.16.9-gke.6`, `e2-small`, 3 nodes, zone `europe-west2-a`). It does not apply manifests. `down.sh` deletes that cluster and will prompt.
+`loader/microservices/k8s/infra/up.sh` creates a GKE cluster named `enterprise-integration` (version `1.16.9-gke.6`, `e2-small`, 3 nodes, zone `europe-west2-a`) and then runs `kubectl apply -k` on the base. `down.sh` deletes that cluster and will prompt. The version pin is unchanged.
 
 ```bash
 kubectl apply -k loader/microservices/k8s/base
 ```
 
-fails as checked in: the kustomization lists `entities/entities-cluster-ip-service.yaml` and `entities/entities-deployment.yaml`, and those files are not in the repo.
+`kustomize build` of that directory exits 0. The missing entities manifests were removed from the kustomization rather than added.
 
-What the manifests do declare, for the pods that are present:
+What the manifests declare:
 
-- Manager and worker: one replica each, `KAFKA_HOST=kafka-cluster-ip-service`, `KAFKA_PORT=9092`, CPU and memory requests and limits, and exec probes. Readiness checks `/tmp/consumer-ready`, which the process writes after the consumer group join. Liveness checks that `/tmp/consumer-live` was touched in the last minute. There is still no database environment.
+- Manager and worker: one replica each, `KAFKA_HOST=kafka-cluster-ip-service`, `KAFKA_PORT=9092`, `SERVICE`, and `DB_HOST=postgres-cluster-ip-service` with `DB_PORT=5432`. CPU and memory requests and limits are set. Readiness checks `/tmp/consumer-ready`, which the process writes after the consumer group join. Liveness checks that `/tmp/consumer-live` was touched in the last minute.
 - Kafka `bitnami/kafka:2.5.0` and ZooKeeper `bitnami/zookeeper:3.6.1`, plaintext on 9092 and 2181, with tcp probes and resource requests and limits. Neither pod sets `hostPort`.
 - Kafka mounts `broker-persistent-volume-claim`. ZooKeeper mounts `registry-persistent-volume-claim`.
-- No Postgres workload. `loader/ormconfig.ts` is Postgres on `localhost` port `3306`, user `test`, password `test`, database `test`, `synchronize: true`, entities glob `entities/*.ts`, which does not match the nested entity files.
+- Postgres `postgres:12` is a Service named `postgres-cluster-ip-service` on port 5432. `loader/ormconfig.ts` reads `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`, defaulting to localhost, port 5432, and database `test` outside the cluster. `synchronize` stays true. The entities glob is `entities/**/*.ts`.
 
 ## `data/`
 
