@@ -87,8 +87,9 @@ Público, as the handlers are written:
 
 1. The worker parses the value as a page number, fetches that page's oldest article, and replies with key `RETRIEVED_PAGE_OLDEST_ARTICLE_DATA`.
 2. If that reply still has an oldest article, the manager enqueues `RETRIEVE_PAGE` and `RETRIEVE_PAGE_OLDEST_ARTICLE` for the next page. `constants.publico.lastPage` (`69200`) is never read. An empty page omits `pageOldestArticle` from the JSON and the crawl stops.
-3. The worker's page handler sends one `PAGE_DATA` message per article object. The manager's `PAGE_DATA` handler parses the value and maps it as an array. A single object does not get that far: the `.map` throws, so no `RETRIEVE_ARTICLE` is produced.
-4. When the value is an array, the manager drops titles already stored and enqueues `RETRIEVE_ARTICLE` with the element JSON. The worker runs `parseInt` on that JSON, which is `NaN`, and requests an article URL built from that integer.
+3. The worker's page handler sends one `PAGE_DATA` message whose value is the JSON array of articles on that page.
+4. The manager parses that array, drops titles already stored, and enqueues one `RETRIEVE_ARTICLE` per remaining article. The value is that article's JSON, including its `url`. A value that is a single object is not an array: `.map` throws, and no `RETRIEVE_ARTICLE` is produced.
+5. The worker parses the `RETRIEVE_ARTICLE` JSON and requests `https://www.publico.pt` plus that article's `url`.
 
 Observador:
 
@@ -127,7 +128,7 @@ There is no backpressure. The manager sends the whole Público article list and 
 
 ## Known gaps
 
-These are absent. The OpenSpec changes under `openspec/changes/` propose them and do not implement them.
+Open changes under `openspec/changes/` are not implemented. Archived changes are.
 
 | Gap | Where it shows up | Proposal |
 | --- | --- | --- |
@@ -138,7 +139,6 @@ These are absent. The OpenSpec changes under `openspec/changes/` propose them an
 | Newspaper is forced to Observador, and transformed fields are dropped on save | `addUniqueNewspaper`, `ArticleDTO.toArticle` | `idempotent-article-writes` |
 | A kill mid-handler duplicates side effects, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional | `crash-safe-crawl-cursor` |
 | No backpressure | One `send` for every batch | `bound-crawl-fanout` |
-| Público page and article payloads do not match across the two processes | Worker sends one object per article; manager maps an array. Worker `parseInt`s the article JSON | `align-crawl-payloads` |
 | No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
 | The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |
 

@@ -6,9 +6,9 @@ export const retrievePage = async (message: KafkaMessage, workerProducer: Produc
   const pageData = await Publico.getPageData(parseInt(message.value.toString()));
   await workerProducer.send({
     topic: topics.PUBLICO,
-    messages: pageData.map((article: any) => ({
-      value: JSON.stringify(article),
+    messages: [{
+      value: JSON.stringify(pageData),
       key: messages.PUBLICO.RETRIEVED_PAGE_DATA
-    }))
+    }]
   });
 };
