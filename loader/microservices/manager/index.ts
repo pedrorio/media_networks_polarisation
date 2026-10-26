@@ -2,6 +2,7 @@ import { messages, topics } from "../../constants";
 import { Kafka } from "kafkajs";
 import { publico } from "./services/publico/";
 import { observador } from "./services/observador";
+import { handleDelivery } from "../../utils/handleDelivery";
 
 export const kafka = new Kafka({
   clientId: "Scrapper",
@@ -34,31 +35,42 @@ const run = async () => {
   
   await managerConsumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      switch (message.key.toString()) {
-        
-        case messages.PUBLICO.RETRIEVED_PAGE_DATA:
-          await publico.retrievedPageData(message, managerProducer);
-          break;
-        
-        case messages.PUBLICO.RETRIEVED_ARTICLE_DATA:
-          await publico.retrievedArticleData(message);
-          break;
-        
-        case messages.PUBLICO.RETRIEVED_PAGE_OLDEST_ARTICLE_DATA:
-          await publico.retrievedPageOldestArticleData(message, managerProducer);
-          break;
-        
-        case messages.OBSERVADOR.RETRIEVED_MOST_RECENT_ARTICLE_DATA:
-          await observador.retrievedMostRecentArticleData(message, managerProducer);
-          break;
-        
-        case messages.OBSERVADOR.FILTERED_ARTICLE_DATA:
-          await observador.filteredArticleData(message)
-          break;
-        
-        default:
-          break;
-      }
+      await handleDelivery(
+        {
+          topic,
+          partition,
+          offset: message.offset,
+          key: message.key === null ? null : message.key.toString(),
+          value: message.value === null ? null : message.value.toString(),
+        },
+        async () => {
+          switch (message.key.toString()) {
+            case messages.PUBLICO.RETRIEVED_PAGE_DATA:
+              await publico.retrievedPageData(message, managerProducer);
+              break;
+
+            case messages.PUBLICO.RETRIEVED_ARTICLE_DATA:
+              await publico.retrievedArticleData(message);
+              break;
+
+            case messages.PUBLICO.RETRIEVED_PAGE_OLDEST_ARTICLE_DATA:
+              await publico.retrievedPageOldestArticleData(message, managerProducer);
+              break;
+
+            case messages.OBSERVADOR.RETRIEVED_MOST_RECENT_ARTICLE_DATA:
+              await observador.retrievedMostRecentArticleData(message, managerProducer);
+              break;
+
+            case messages.OBSERVADOR.FILTERED_ARTICLE_DATA:
+              await observador.filteredArticleData(message);
+              break;
+
+            default:
+              break;
+          }
+        },
+        managerProducer,
+      );
     },
   });
   

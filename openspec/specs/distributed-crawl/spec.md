@@ -109,27 +109,28 @@ The application SHALL NOT set autoCommit, autoCommitInterval, or autoCommitThres
 - **WHEN** every handler in the fetch has returned
 - **THEN** the consumer commits the resolved offsets
 
-### Requirement: Handler failures are retried then the consumer restarts
-If a handler throws, the consumer SHALL commit only offsets already resolved in that fetch and SHALL leave the failed offset uncommitted. The consumer SHALL retry that fetch using the kafkajs 1.12 default of 10 retries. When those retries are exhausted the crash path SHALL restart the consumer because the error is KafkaJSNumberOfRetriesExceeded, which reads the same uncommitted message again. The application SHALL NOT cap those restarts.
+### Requirement: Failed handlers retry then dead-letter
+A handler that throws SHALL be retried at most 5 times for that delivery cycle. The failed offset SHALL stay uncommitted until the budget is spent. The consumer SHALL NOT use an uncapped restart loop as the retry policy.
 
 #### Scenario: Handler throws
 - **WHEN** eachMessage throws a non-KafkaJS error
 - **THEN** the failed offset stays uncommitted
 - **AND** earlier resolved offsets in that fetch are committed
-- **AND** the fetch is retried
+- **AND** the same message is attempted again until the budget is spent
 
 #### Scenario: Retries exhausted
-- **WHEN** the tenth retry still fails
-- **THEN** the consumer disconnects and starts again
-- **AND** the same message is delivered again
+- **WHEN** the fifth attempt still throws
+- **THEN** one dead-letter record is appended with the original topic, key, value, and error text
+- **AND** the original offset is committed
+- **AND** the consumer does not restart onto that message
 
-### Requirement: No dead-letter topic
-The application SHALL NOT declare a dead-letter topic, a retry topic, or a poison-message counter. A message that keeps failing SHALL remain the next message for that partition.
+### Requirement: Poison messages are dead-lettered
+The application SHALL declare a dead-letter topic. A message that fails past the retry budget SHALL be appended there once and SHALL NOT remain the next uncommitted message on that partition.
 
 #### Scenario: Permanent handler failure
-- **WHEN** a message makes the handler throw on every delivery
-- **THEN** no dead-letter record is produced
-- **AND** the consumer continues to restart onto that message
+- **WHEN** a message makes the handler throw on every attempt until the budget is spent
+- **THEN** one dead-letter record is produced
+- **AND** the partition advances past that message
 
 ### Requirement: Article writes are idempotent on source identity
 Each produced article message SHALL carry the outlet and the source article id. A second delivery of the same pair SHALL NOT insert another article row. Title SHALL NOT be the idempotency key.

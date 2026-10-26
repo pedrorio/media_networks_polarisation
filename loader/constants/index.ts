@@ -5,6 +5,8 @@ export const newspapers = {
 
 export const topics = newspapers;
 
+export const deadLetterTopic = "CRAWL_DEAD_LETTER";
+
 export const messages = {
   PUBLICO: {
     RETRIEVE_PAGE: "RETRIEVE_PAGE",
