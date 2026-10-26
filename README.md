@@ -132,7 +132,6 @@ Open changes under `openspec/changes/` are not implemented. Archived changes are
 
 | Gap | Where it shows up | Proposal |
 | --- | --- | --- |
-| No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
 | The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |
 
 Also not fixed by those proposals, and not present in the code: `filterArticles` calls `concat` without assigning the result and returns an empty list. No crawl path calls it. The sequential scripts call `getFilteredArticles` directly.
@@ -184,9 +183,9 @@ fails as checked in: the kustomization lists `entities/entities-cluster-ip-servi
 
 What the manifests do declare, for the pods that are present:
 
-- Manager and worker: one replica each, `KAFKA_HOST=kafka-cluster-ip-service`, `KAFKA_PORT=9092`, no probes, no resource requests or limits, no database environment.
-- Kafka `bitnami/kafka:2.5.0` and ZooKeeper `bitnami/zookeeper:3.6.1`, plaintext, `hostPort` 9092 and 2181, no probes, no resource limits.
-- ZooKeeper's volume `claimName` is `broker-persistent-volume-claim`, the same ReadWriteOnce claim Kafka uses. `registry-persistent-volume-claim` is unused.
+- Manager and worker: one replica each, `KAFKA_HOST=kafka-cluster-ip-service`, `KAFKA_PORT=9092`, CPU and memory requests and limits, and exec probes. Readiness checks `/tmp/consumer-ready`, which the process writes after the consumer group join. Liveness checks that `/tmp/consumer-live` was touched in the last minute. There is still no database environment.
+- Kafka `bitnami/kafka:2.5.0` and ZooKeeper `bitnami/zookeeper:3.6.1`, plaintext on 9092 and 2181, with tcp probes and resource requests and limits. Neither pod sets `hostPort`.
+- Kafka mounts `broker-persistent-volume-claim`. ZooKeeper mounts `registry-persistent-volume-claim`.
 - No Postgres workload. `loader/ormconfig.ts` is Postgres on `localhost` port `3306`, user `test`, password `test`, database `test`, `synchronize: true`, entities glob `entities/*.ts`, which does not match the nested entity files.
 
 ## `data/`

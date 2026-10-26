@@ -3,6 +3,7 @@ import { Kafka } from "kafkajs";
 import { publico } from "./services/publico/";
 import { observador } from "./services/observador";
 import { handleDelivery } from "../../utils/handleDelivery";
+import { markConsumerJoined, startHeartbeat } from "../../utils/health";
 import { seedOrResume } from "./seed";
 
 export const kafka = new Kafka({
@@ -14,7 +15,11 @@ export const managerProducer = kafka.producer();
 export const managerConsumer = kafka.consumer({ groupId: "manager-group" });
 
 const run = async () => {
-  
+  startHeartbeat();
+  managerConsumer.on(managerConsumer.events.GROUP_JOIN, () => {
+    markConsumerJoined();
+  });
+
   await managerProducer.connect();
   await seedOrResume(managerProducer);
 
