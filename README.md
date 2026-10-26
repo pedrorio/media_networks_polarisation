@@ -91,10 +91,9 @@ Público, as the handlers are written:
 Observador:
 
 1. The worker ignores the seed value, calls the widget endpoint, and replies with the newest article under `MOST_RECENT_ARTICLE_DATA`.
-2. The manager splits that id with `getArticleIdBatches(id, 1000)` and sends every batch in one produce, key `FILTER_ARTICLES`.
-3. `1000` is not a batch size. For id `2500` the batches are `[1, 2]`, `[3, 4, 5]`, `[6, 7]`, and `[8, 9, 10]`. Ids above 10 are not requested. See `openspec/specs/distributed-crawl/spec.md`.
-4. The worker POSTs each batch to the bulk endpoint and emits one `FILTERED_ARTICLE_DATA` per returned article.
-5. The manager loads rows by title and saves only when that result is falsy. TypeORM `find` returns an array. An array is truthy even when empty, so this save does not run.
+2. The manager splits ids from 1 through that newest id, inclusive, into contiguous batches of at most 1000 and sends every batch in one produce, key `FILTER_ARTICLES`. For id 10 and size 4 the batches are `[1, 2, 3, 4]`, `[5, 6, 7, 8]`, and `[9, 10]`.
+3. The worker POSTs each batch to the bulk endpoint and emits one `FILTERED_ARTICLE_DATA` per returned article.
+4. The manager loads rows by title and saves only when that result is falsy. TypeORM `find` returns an array. An array is truthy even when empty, so this save does not run.
 
 `ArticleDTO.toArticle` uses `excludeExtraneousValues: true`. The entity fields are not `@Expose`d, so those properties are dropped before a save. `addUniqueNewspaper` looks up the newspaper named `OBSERVADOR` only. If that row exists, every article, including Público, is pointed at it. If it does not, the article object is passed to the newspaper repository.
 
@@ -138,7 +137,6 @@ These are absent. The OpenSpec changes under `openspec/changes/` propose them an
 | A kill mid-handler duplicates side effects, and a manager restart appends new seeds | Offset commit is after the handler. Seeds are unconditional | `crash-safe-crawl-cursor` |
 | No backpressure | One `send` for every batch | `bound-crawl-fanout` |
 | Público page and article payloads do not match across the two processes | Worker sends one object per article; manager maps an array. Worker `parseInt`s the article JSON | `align-crawl-payloads` |
-| Observador id batches drop most ids | `getArticleIdBatches(2500, 1000)` yields only ids 1 through 10 | `cover-observador-id-space` |
 | Clean output is erased, and nothing writes `data/raw` | `sed file > file`. No fetch command | `preserve-cleaned-records` |
 | No readiness, liveness, or CPU and memory limits. ZooKeeper mounts the broker claim. Kafka and ZooKeeper set `hostPort` | The four Deployments | `workload-health-and-limits` |
 | The documented entrypoints do not start the stack | Skaffold paths, Dockerfiles, kustomize, ormconfig, `up.sh` | `runnable-local-and-cluster-stack` |

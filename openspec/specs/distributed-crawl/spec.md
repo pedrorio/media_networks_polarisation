@@ -86,17 +86,17 @@ The worker SHALL ignore the seed value, fetch the Observador widget, and reply w
 - **THEN** it produces one FILTER_ARTICLES message per batch
 - **AND** it does not wait for a batch to finish before sending the rest
 
-### Requirement: Id batches neither cover nor cap the id space
-getArticleIdBatches SHALL slice range(1, mostRecent), which includes both ends, into batches whose count is ceil(mostRecent / multiple) + 1. Bounds SHALL be length / multiple times the batch index, truncated with JavaScript ToInteger. multiple SHALL NOT be a maximum batch length. Ids past the last bound SHALL NOT be sent.
+### Requirement: Id batches cover every id up to the newest
+The manager SHALL enqueue FILTER_ARTICLES batches that together contain every integer from 1 through the most recent Observador id, inclusive, with at most 1000 ids in each batch and no gaps or duplicates.
 
 #### Scenario: Id 10 split by 4
-- **WHEN** the most recent id is 10 and multiple is 4
-- **THEN** the batches are [1, 2], [3, 4, 5], [6, 7], and [8, 9, 10]
+- **WHEN** the most recent id is 10 and the batch size is 4
+- **THEN** the batches are [1, 2, 3, 4], [5, 6, 7, 8], and [9, 10]
 
 #### Scenario: Id 2500 split by 1000
-- **WHEN** the most recent id is 2500 and multiple is 1000
-- **THEN** the batches are [1, 2], [3, 4, 5], [6, 7], and [8, 9, 10]
-- **AND** every id above 10 is absent
+- **WHEN** the most recent id is 2500 and the batch size is 1000
+- **THEN** the batches cover every id from 1 through 2500 once
+- **AND** no batch holds more than 1000 ids
 
 ### Requirement: Offsets commit after handlers return
 The application SHALL NOT set autoCommit, autoCommitInterval, or autoCommitThreshold. With kafkajs 1.12 those defaults leave commitOffsetsIfNecessary a no-op, and the fetch loop SHALL commit resolved offsets after the batch. An offset SHALL NOT be resolved before the handler returns. Producer sends SHALL NOT set acks, a transactional id, or the idempotent producer, so the library default acks of -1 and idempotent false apply.

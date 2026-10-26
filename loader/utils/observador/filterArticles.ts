@@ -1,6 +1,5 @@
 import axios from "axios";
 import {ObservadorArticleBulk, ObservadorArticle} from "../../typings/observador/article.type"
-import { range } from "../range";
 
 export const divideArticleIdsInBatches = (batchNumber: number, multiple: number, allPossibleArticleIds: number[]) => allPossibleArticleIds.slice(
         allPossibleArticleIds.length / multiple * (batchNumber - 1),
@@ -8,9 +7,19 @@ export const divideArticleIdsInBatches = (batchNumber: number, multiple: number,
 );
 
 export const getArticleIdBatches = (mostRecentArticleId: number, multiple: number): number[][] => {
-    const divisor = Math.ceil(mostRecentArticleId / multiple) + 1;
-    const allPossibleArticleIds: number[] = range(1, mostRecentArticleId);
-    return range(1, divisor).map(batchNumber => divideArticleIdsInBatches(batchNumber, multiple, allPossibleArticleIds))
+    if (mostRecentArticleId < 1 || multiple < 1) {
+        return [];
+    }
+    const batches: number[][] = [];
+    for (let start = 1; start <= mostRecentArticleId; start += multiple) {
+        const end = Math.min(start + multiple - 1, mostRecentArticleId);
+        const batch: number[] = [];
+        for (let id = start; id <= end; id += 1) {
+            batch.push(id);
+        }
+        batches.push(batch);
+    }
+    return batches;
 }
 
 export const getFilteredArticles = async (batch: number[]): Promise<ObservadorArticleBulk[]> => {
