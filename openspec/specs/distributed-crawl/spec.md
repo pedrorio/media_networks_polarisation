@@ -140,26 +140,26 @@ Each produced article message SHALL carry the outlet and the source article id. 
 - **THEN** the article table contains one row for that pair
 - **AND** follow-up produces from the first attempt are not recalled
 
-### Requirement: Kill mid-handler does not roll back side effects
-If the process is killed inside a handler, uncommitted offsets SHALL be delivered again after the group session ends. HTTP calls, follow-up produces, and database writes already performed SHALL NOT be rolled back. The application SHALL NOT open a transaction that covers Kafka and Postgres.
+### Requirement: Redelivery after a crash does not duplicate work
+If the process is killed inside a handler, Kafka MAY deliver the uncommitted message again. A replay SHALL NOT append a second result for the same work identity and SHALL NOT leave the system to a manual rollback. Safety SHALL come from idempotent follow-up produces, not from a transaction that covers Kafka and Postgres.
 
 #### Scenario: Worker dies after producing a reply
-- **WHEN** the worker has sent a result message and is then killed before the fetch commits
-- **THEN** the original work message is delivered again
-- **AND** the result message already appended stays on the topic
+- **WHEN** the worker has sent a result and is then killed before the offset commit
+- **THEN** the work message may be delivered again
+- **AND** the result topic contains one result for that work identity
 
 #### Scenario: Manager dies after a database save
 - **WHEN** the manager has saved a row and is killed before the offset commit
-- **THEN** the result message is delivered again
-- **AND** the saved row is not removed
+- **THEN** the result message may be delivered again
+- **AND** the article row count for that source id stays one
 
-### Requirement: Manager restart appends new seeds
-Every manager process start SHALL produce the two seed messages again, including when manager-group already has committed offsets. The new seeds SHALL be additional records. They SHALL NOT replace the log.
+### Requirement: Manager restart resumes the crawl cursor
+The manager SHALL store the next Público page and the Observador batches not yet finished. A later process start SHALL resume that cursor. It SHALL NOT append another page-1 seed or another most-recent seed while the cursor is unfinished.
 
 #### Scenario: Manager pod restarts
-- **WHEN** the manager container starts again after a crash
-- **THEN** another page-1 Público seed and another Observador seed are appended
-- **AND** the group resumes from its committed offsets rather than trimming the log
+- **WHEN** the manager container starts again during a Público crawl that has passed page 1
+- **THEN** it does not append another page-1 seed
+- **AND** the next page it enqueues is the stored cursor
 
 ### Requirement: No application processing deadline
 Manager and worker code SHALL NOT set a per-message timeout. KafkaJS session and request timeouts SHALL remain the library defaults because the application does not pass them. The Deployment manifests SHALL NOT set a probe timeout.

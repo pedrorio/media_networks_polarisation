@@ -3,6 +3,7 @@ import { Kafka } from "kafkajs";
 import { publico } from "./services/publico/";
 import { observador } from "./services/observador";
 import { handleDelivery } from "../../utils/handleDelivery";
+import { seedOrResume } from "./seed";
 
 export const kafka = new Kafka({
   clientId: "Scrapper",
@@ -15,21 +16,8 @@ export const managerConsumer = kafka.consumer({ groupId: "manager-group" });
 const run = async () => {
   
   await managerProducer.connect();
-  
-  await managerProducer.send({
-    topic: topics.PUBLICO,
-    messages: [
-      { value: (1).toString(), key: messages.PUBLICO.RETRIEVE_PAGE_OLDEST_ARTICLE },
-    ],
-  });
-  
-  await managerProducer.send({
-    topic: topics.OBSERVADOR,
-    messages: [
-      { value: null, key: messages.OBSERVADOR.RETRIEVE_MOST_RECENT_ARTICLE },
-    ],
-  });
-  
+  await seedOrResume(managerProducer);
+
   await managerConsumer.subscribe({ topic: topics.PUBLICO, fromBeginning: true });
   await managerConsumer.subscribe({ topic: topics.OBSERVADOR, fromBeginning: true });
   

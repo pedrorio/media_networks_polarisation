@@ -50,7 +50,34 @@ function recordingProducer(sent: SentRecord[]): Producer {
   } as Producer;
 }
 
+function installCursorRepository(): void {
+  const cursors: { outlet: string; sentResults: string[] }[] = [];
+  const reposKey = Object.keys(nodeRequire.cache).find((key) =>
+    key.endsWith("/loader/utils/getRepositories.ts"),
+  );
+  const repos = reposKey ? nodeRequire.cache[reposKey] : undefined;
+  if (!repos) {
+    throw new Error("getRepositories module is not loaded");
+  }
+  repos.exports.getRepositories = async () => ({
+    cursorRepository: {
+      findOne: async (query: { outlet: string }) =>
+        cursors.find((row) => row.outlet === query.outlet) ?? null,
+      save: async (row: { outlet: string; sentResults: string[] }) => {
+        const index = cursors.findIndex((existing) => existing.outlet === row.outlet);
+        if (index >= 0) {
+          cursors[index] = row;
+          return row;
+        }
+        cursors.push(row);
+        return row;
+      },
+    },
+  });
+}
+
 async function runPage(input: PageInput): Promise<unknown> {
+  installCursorRepository();
   let requestedPage: number | undefined;
   Publico.getPageData = async (pageNumber: number) => {
     requestedPage = pageNumber;
